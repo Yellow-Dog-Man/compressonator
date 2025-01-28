@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-add_library(Image_KTX2 STATIC "")
+add_library(Image_KTX2 SHARED "")
 
 target_sources(Image_KTX2
     PRIVATE

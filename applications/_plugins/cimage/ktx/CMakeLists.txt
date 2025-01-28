@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-add_library(Image_KTX STATIC "")
+add_library(Image_KTX SHARED "")
 
 # Enabled KTX1 Only
 file(GLOB_RECURSE KTX_Lib

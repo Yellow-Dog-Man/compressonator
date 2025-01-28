@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-add_library(Image_TGA STATIC "")
+add_library(Image_TGA SHARED "")
 
 target_sources(Image_TGA
     PRIVATE
