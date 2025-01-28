@@ -8,7 +8,7 @@ set(GPU_DECODE_SRC
   gpu_decode.h
 )
 
-add_library(CMP_GpuDecode STATIC ${GPU_DECODE_H} ${GPU_DECODE_SRC})
+add_library(CMP_GpuDecode SHARED ${GPU_DECODE_H} ${GPU_DECODE_SRC})
 
 target_include_directories(CMP_GpuDecode PRIVATE
     ${PROJECT_SOURCE_DIR}/applications/_plugins/common

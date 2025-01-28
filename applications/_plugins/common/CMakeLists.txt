@@ -60,7 +60,7 @@ if (OPTION_BUILD_EXR)
     list(APPEND PLUGIN_COMMON_H   cexr.h)
 endif()
 
-add_library(CMP_Common STATIC 
+add_library(CMP_Common SHARED
     ${PLUGIN_COMMON_SRC} 
     ${PLUGIN_COMMON_SRC_QT}
     ${PLUGIN_COMMON_H}
