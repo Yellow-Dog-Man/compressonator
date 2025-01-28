@@ -25,9 +25,33 @@ jobs:
         working-directory: ${{ env.wps }}
         run: |
           CPLUS_INCLUDE_PATH=/usr/include/opencv4/ make -j4
-          tree ${{ github.workspace }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-lib
           path: ${{ env.wps }}/lib/**/*.so
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup cmake
+        run: |
+          cmake -E make_directory ${{ github.workspace }}/build/bin
+          python build/fetch_dependencies.py
+      - name: Setup msbuild
+        uses: microsoft/setup-msbuild@v2
+      - name: Build compressonator
+        run: |
+          msbuild -target:build -property:Configuration=Release_MD_DLL -property:Platform=x64 -m build_sdk\cmp_framework.sln
+          msbuild -target:build -property:Configuration=Release_MD_DLL -property:Platform=x64 -m build_sdk\cmp_compressonatorlib.sln
+      - name: Collect build results
+        shell: bash
+        run: |
+          mkdir results
+          cp build/Release*/x64/{*.lib,*.dll} results
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-lib
+          path: results/
