@@ -1,0 +1,33 @@
+name: "YDMS Build"
+
+on: [push]
+
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set dist name
+        run: |
+          echo "wps=${{ github.workspace }}/builddir" >> "$GITHUB_ENV"
+          mkdir -p ${{ github.workspace }}/builddir
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-common-dev libglew-dev libicu-dev libegl1-mesa-dev libopenexr-dev libopencv-dev libglm-dev
+      - name: Generate build files
+        working-directory: ${{ env.wps }}
+        run: |
+          cmake -DOPTION_ENABLE_ALL_APPS=OFF -DOPTION_BUILD_CMP_SDK=ON -DOPTION_CMP_QT=OFF -DOPTION_BUILD_KTX2=ON -DOPTION_BUILD_EXR=ON -DOPTION_BUILD_GUI=OFF -DBUILD_SHARED_LIBS=ON ..
+      - name: Build library
+        working-directory: ${{ env.wps }}
+        run: |
+          CPLUS_INCLUDE_PATH=/usr/include/opencv4/ make -j4
+          tree ${{ github.workspace }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-lib
+          path: ${{ env.wps }}/lib/**/*.so
