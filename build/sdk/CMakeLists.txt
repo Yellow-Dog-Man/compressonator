@@ -136,6 +136,9 @@ if (CMP_HOST_WINDOWS)
     )
 endif()
 
+# TMP: disable warnings - -prime
+add_compile_options(-w)
+
 # -----------------------------------
 # Set or get all package requirements
 # -----------------------------------

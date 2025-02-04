@@ -46,12 +46,15 @@ include(cmake/helperfunctions.cmake)
 # ------------------------------
 
 if (CMP_HOST_WINDOWS)
-    add_compile_options(/W4 /wd4201)
+#    add_compile_options(/W4 /wd4201)
 #    add_compile_options(/W4 /WX /wd4201)
 elseif(CMP_HOST_LINUX)
-    add_compile_options(-Wall)
+#    add_compile_options(-Wall)
 #    add_compile_options(-Wall -Werror)
 endif()
+
+# TMP: Disable warnings - Prime
+add_compile_options(-w)
 
 # ------------------------------------
 # Visual Studio project folder names
