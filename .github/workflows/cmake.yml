@@ -44,7 +44,7 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with: 
           name: CompressonatorCLI_64_Windows_Master_Build
           path: ${{github.workspace}}/build/bin/bin/Release
@@ -134,7 +134,7 @@ jobs:
 
       # Will probably want to collect the files into a better structure before running this command
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: 
           name: CompressonatorFramework_Windows_Master_Build
           path: CompressonatorFramework_result/
