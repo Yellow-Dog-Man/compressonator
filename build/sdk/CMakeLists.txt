@@ -196,7 +196,7 @@ endmacro()
 
 cmp_option(OPTION_BUILD_BROTLIG   "Use Brotli-G Codec for Commandline" OFF)
 cmp_option(OPTION_CMP_GTC       "Use GTC Codec" OFF) # Internal R&D
-cmp_option(OPTION_BUILD_ASTC    "Build ASTC Support" OFF)
+cmp_option(OPTION_BUILD_ASTC    "Build ASTC Support" ON)
 cmp_option(OPTION_CMP_APC    "APC" OFF)
 
 if (OPTION_BUILD_BROTLIG)
