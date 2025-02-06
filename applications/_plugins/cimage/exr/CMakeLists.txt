@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-add_library(Image_EXR SHARED "")
+add_library(Image_EXR STATIC "")
 
 target_sources(Image_EXR
     PRIVATE

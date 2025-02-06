@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-add_library(CMP_Core SHARED)
+add_library(CMP_Core STATIC)
 
 target_sources(CMP_Core
     PRIVATE
@@ -67,7 +67,7 @@ set_target_properties(CMP_Core PROPERTIES FOLDER ${PROJECT_FOLDER_SDK_LIBS})
 # Core SIMD options
 
 # SSE
-add_library(CMP_Core_SSE SHARED)
+add_library(CMP_Core_SSE STATIC)
 target_sources(CMP_Core_SSE PRIVATE source/core_simd_sse.cpp)
 target_include_directories(CMP_Core_SSE PRIVATE source shaders)
 
@@ -78,7 +78,7 @@ endif()
 set_target_properties(CMP_Core_SSE PROPERTIES FOLDER ${PROJECT_FOLDER_SDK_LIBS})
 
 # AVX
-add_library(CMP_Core_AVX SHARED)
+add_library(CMP_Core_AVX STATIC)
 target_sources(CMP_Core_AVX PRIVATE source/core_simd_avx.cpp)
 target_include_directories(CMP_Core_AVX PRIVATE source shaders)
 
@@ -91,7 +91,7 @@ endif()
 set_target_properties(CMP_Core_AVX PROPERTIES FOLDER ${PROJECT_FOLDER_SDK_LIBS})
 
 # AVX-512
-add_library(CMP_Core_AVX512 SHARED)
+add_library(CMP_Core_AVX512 STATIC)
 target_sources(CMP_Core_AVX512 PRIVATE source/core_simd_avx512.cpp)
 target_include_directories(CMP_Core_AVX512 PRIVATE source shaders)
 
