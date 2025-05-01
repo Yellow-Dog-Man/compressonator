@@ -66,13 +66,27 @@ set_target_properties(CMP_Core PROPERTIES FOLDER ${PROJECT_FOLDER_SDK_LIBS})
 
 # Core SIMD options
 
+# Check architecture
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("
+#if defined(__aarch64__) || defined(_M_ARM64)
+int main() { return 0; }
+#else
+#error not arm64
+#endif
+" CMP_IS_ARM64)
+
 # SSE
 add_library(CMP_Core_SSE STATIC)
 target_sources(CMP_Core_SSE PRIVATE source/core_simd_sse.cpp)
 target_include_directories(CMP_Core_SSE PRIVATE source shaders)
 
 if (UNIX)
-    target_compile_options(CMP_Core_SSE PRIVATE -march=nehalem)
+    if (CMP_IS_ARM64)
+        target_compile_definitions(CMP_Core_SSE PRIVATE CMP_ARM64_BUILD)
+    else()
+        target_compile_options(CMP_Core_SSE PRIVATE -march=nehalem)
+    endif()
 endif()
 
 set_target_properties(CMP_Core_SSE PROPERTIES FOLDER ${PROJECT_FOLDER_SDK_LIBS})
@@ -83,9 +97,17 @@ target_sources(CMP_Core_AVX PRIVATE source/core_simd_avx.cpp)
 target_include_directories(CMP_Core_AVX PRIVATE source shaders)
 
 if (WIN32)
-    target_compile_options(CMP_Core_AVX PRIVATE /arch:AVX2)
+    if (CMP_IS_ARM64)
+        target_compile_definitions(CMP_Core_AVX PRIVATE CMP_ARM64_BUILD)
+    else()
+        target_compile_options(CMP_Core_AVX PRIVATE /arch:AVX2)
+    endif()
 else()
-    target_compile_options(CMP_Core_AVX PRIVATE -march=haswell)
+    if (CMP_IS_ARM64)
+        target_compile_definitions(CMP_Core_AVX PRIVATE CMP_ARM64_BUILD)
+    else()
+        target_compile_options(CMP_Core_AVX PRIVATE -march=haswell)
+    endif()
 endif()
 
 set_target_properties(CMP_Core_AVX PROPERTIES FOLDER ${PROJECT_FOLDER_SDK_LIBS})
@@ -96,9 +118,17 @@ target_sources(CMP_Core_AVX512 PRIVATE source/core_simd_avx512.cpp)
 target_include_directories(CMP_Core_AVX512 PRIVATE source shaders)
 
 if (WIN32)
-    target_compile_options(CMP_Core_AVX512 PRIVATE /arch:AVX-512)
+    if (CMP_IS_ARM64)
+        target_compile_definitions(CMP_Core_AVX512 PRIVATE CMP_ARM64_BUILD)
+    else()
+        target_compile_options(CMP_Core_AVX512 PRIVATE /arch:AVX-512)
+    endif()
 else()
-    target_compile_options(CMP_Core_AVX512 PRIVATE -march=knl)
+    if (CMP_IS_ARM64)
+        target_compile_definitions(CMP_Core_AVX512 PRIVATE CMP_ARM64_BUILD)
+    else()
+        target_compile_options(CMP_Core_AVX512 PRIVATE -march=knl)
+    endif()
 endif()
 
 set_target_properties(CMP_Core_AVX512 PROPERTIES FOLDER ${PROJECT_FOLDER_SDK_LIBS})
