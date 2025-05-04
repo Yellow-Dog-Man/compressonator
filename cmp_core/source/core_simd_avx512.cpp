@@ -21,6 +21,25 @@
 //
 //=====================================================================
 
+#if defined(__aarch64__) || defined(_M_ARM64) || defined(CMP_ARM64_BUILD)
+#include <arm_neon.h>
+#include "core_simd.h"
+#include "common_def.h"
+#include "bcn_common_kernel.h"
+
+#if defined(_WIN32) || defined(_WIN64)
+#define ALIGN_64 __declspec(align(64))
+#else
+#define ALIGN_64 __attribute__((aligned(64)))
+#endif
+
+extern CGU_UINT32 CompressBlockBC1(const CGU_UINT8 *srcBlock, CGU_UINT32 srcStrideInBytes, CGU_UINT8 *dst, const CGU_UINT8 *options);
+
+void CompressBlockBC1_RGBA_AVX512(const CMP_Vec4uc srcBlockTemp[16], CMP_GLOBAL CGU_UINT32 compressedBlock[2], CMP_GLOBAL const CGU_UINT8* options) {
+    CompressBlockBC1((CGU_UINT8*)srcBlockTemp, 16, (CGU_UINT8*)compressedBlock, options);
+}
+
+#else
 #include <immintrin.h>
 
 #include "core_simd.h"
@@ -136,3 +155,4 @@ CGU_FLOAT avx512_bc1ComputeBestEndpoints(CGU_FLOAT endpointsOut[2],
 
     return minError;
 }
+#endif

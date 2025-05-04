@@ -5,7 +5,11 @@ on: [push]
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        osver: [ubuntu-latest, ubuntu-24.04-arm]
+
+    runs-on: ${{ matrix.osver }}
 
     steps:
       - uses: actions/checkout@v4
@@ -13,6 +17,12 @@ jobs:
         run: |
           echo "wps=${{ github.workspace }}/builddir" >> "$GITHUB_ENV"
           mkdir -p ${{ github.workspace }}/builddir
+
+          if ${{ matrix.osver == 'ubuntu-24.04-arm' }}; then
+            echo "distname=compressonator-linux-arm" >> "$GITHUB_ENV"
+          else
+            echo "distname=compressonator-linux" >> "$GITHUB_ENV"
+          fi
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -20,7 +30,7 @@ jobs:
       - name: Generate build files
         working-directory: ${{ env.wps }}
         run: |
-          cmake -DOPTION_ENABLE_ALL_APPS=OFF -DOPTION_BUILD_CMP_SDK=ON -DOPTION_CMP_QT=OFF -DOPTION_BUILD_KTX2=ON -DOPTION_BUILD_EXR=ON -DOPTION_BUILD_GUI=OFF -DBUILD_SHARED_LIBS=ON ..
+          cmake -DOPTION_ENABLE_ALL_APPS=OFF -DOPTION_BUILD_CMP_SDK=ON -DOPTION_CMP_QT=OFF -DOPTION_BUILD_KTX2=ON -DOPTION_BUILD_EXR=ON -DOPTION_BUILD_GUI=OFF -DBUILD_SHARED_LIBS=ON -DCMAKE_CXX_FLAGS="-march=native" ..
       - name: Build library
         working-directory: ${{ env.wps }}
         run: |
@@ -28,7 +38,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-lib
+          name: ${{ env.distname }}
           path: ${{ env.wps }}/lib/**/*.so
 
   build-windows:
