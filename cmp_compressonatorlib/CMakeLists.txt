@@ -68,7 +68,7 @@ if (OPTION_BUILD_BROTLIG)
 endif()
 
 add_library(CMP_Compressonator 
-    SHARED
+    STATIC
     version.h
     common.h
     compress.cpp
