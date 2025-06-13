@@ -182,51 +182,48 @@ CCodec_BC7::~CCodec_BC7()
 {
     if (m_LibraryInitialized)
     {
-        if (m_Use_MultiThreading)
+        // Tell all the live threads that they can exit when they have finished any current work
+        for (int i = 0; i < m_LiveThreads; i++)
         {
-            // Tell all the live threads that they can exit when they have finished any current work
-            for (int i = 0; i < m_LiveThreads; i++)
-            {
-                // If a thread is in the running state then we need to wait for it to finish
-                // any queued work from the producer before we can tell it to exit.
-                //
-                // If we don't wait then there is a race condition here where we have
-                // told the thread to run but it hasn't yet been scheduled - if we set
-                // the exit flag before it runs then its block will not be processed.
+            // If a thread is in the running state then we need to wait for it to finish
+            // any queued work from the producer before we can tell it to exit.
+            //
+            // If we don't wait then there is a race condition here where we have
+            // told the thread to run but it hasn't yet been scheduled - if we set
+            // the exit flag before it runs then its block will not be processed.
 #pragma warning(push)
 #pragma warning(disable : 4127)  //warning C4127: conditional expression is constant
-                while (1)
+            while (1)
+            {
+                if (m_EncodeParameterStorage[i].run != TRUE)
                 {
-                    if (m_EncodeParameterStorage[i].run != TRUE)
-                    {
-                        break;
-                    }
+                    break;
                 }
+            }
 #pragma warning(pop)
-                // Signal to the thread that it can exit
-                m_EncodeParameterStorage[i].exit = TRUE;
-            }
+            // Signal to the thread that it can exit
+            m_EncodeParameterStorage[i].exit = TRUE;
+        }
 
-            // Now wait for all threads to have exited
-            if (m_LiveThreads > 0)
+        // Now wait for all threads to have exited
+        if (m_LiveThreads > 0)
+        {
+            for (CMP_DWORD dwThread = 0; dwThread < m_LiveThreads; dwThread++)
             {
-                for (CMP_DWORD dwThread = 0; dwThread < m_LiveThreads; dwThread++)
-                {
-                    std::thread& curThread = m_EncodingThreadHandle[dwThread];
+                std::thread& curThread = m_EncodingThreadHandle[dwThread];
 
-                    curThread.join();
-                }
+                curThread.join();
             }
+        }
 
-            for (unsigned int i = 0; i < m_LiveThreads; i++)
-            {
-                std::thread& curThread = m_EncodingThreadHandle[i];
+        for (unsigned int i = 0; i < m_LiveThreads; i++)
+        {
+            std::thread& curThread = m_EncodingThreadHandle[i];
 
-                curThread = std::thread();
-            }
+            curThread = std::thread();
+        }
 
-            delete[] m_EncodingThreadHandle;
-        }  // MultiThreading
+        delete[] m_EncodingThreadHandle;
 
         m_EncodingThreadHandle = NULL;
 
