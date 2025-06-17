@@ -87,7 +87,7 @@ CCodec_BC6H::CCodec_BC6H(CodecType codecType)
     // user definable setting
     m_Exposure           = 1.0;
     m_ModeMask           = 0xFFFF;
-    m_Quality            = (float)AMD_CODEC_QUALITY_DEFAULT;
+    m_fQuality           = (float)AMD_CODEC_QUALITY_DEFAULT;
     m_Use_MultiThreading = true;
     m_NumThreads         = 0;
     if (codecType == CT_BC6H)
@@ -295,7 +295,7 @@ CodecError CCodec_BC6H::CInitializeBC6HLibrary()
             CMP_BC6H_BLOCK_PARAMETERS user_options;
 
             user_options.bIsSigned      = m_bIsSigned;
-            user_options.fQuality       = m_Quality;
+            user_options.fQuality       = m_fQuality;
             user_options.dwMask         = m_ModeMask;
             user_options.fExposure      = m_Exposure;
             user_options.bUsePatternRec = m_UsePatternRec;
@@ -322,7 +322,7 @@ CodecError CCodec_BC6H::CInitializeBC6HLibrary()
             }
 
 #ifdef USE_DBGTRACE
-            DbgTrace(("Encoder[%d]:ModeMask %X, Quality %f\n", i, m_ModeMask, m_Quality));
+            DbgTrace(("Encoder[%d]:ModeMask %X, Quality %f\n", i, m_ModeMask, m_fQuality));
 #endif
         }
         
