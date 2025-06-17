@@ -123,19 +123,6 @@ bool CCodec_BC6H::SetParameter(const CMP_CHAR* pszParamName, CMP_CHAR* sValue)
         m_NumThreads         = (CMP_BYTE)std::stoi(sValue);
         m_Use_MultiThreading = m_NumThreads != 1;
     }
-    else if (strcmp(pszParamName, "Quality") == 0)
-    {
-        m_Quality = std::stof(sValue);
-        if ((m_Quality < 0) || (m_Quality > 1.0))
-        {
-            return false;
-        }
-    }
-    //else
-    //    if (strcmp(pszParamName, "OutputExposure") == 0)
-    //    {
-    //        m_Exposure = std::stof(sValue);
-    //    }
     else
         return CCodec_DXTC::SetParameter(pszParamName, sValue);
 
@@ -160,14 +147,7 @@ bool CCodec_BC6H::SetParameter(const CMP_CHAR* pszParamName, CMP_DWORD dwValue)
 
 bool CCodec_BC6H::SetParameter(const CMP_CHAR* pszParamName, CODECFLOAT fValue)
 {
-    if (strcmp(pszParamName, "Quality") == 0)
-        m_Quality = fValue;
-    //else
-    //if (strcmp(pszParamName, "OutputExposure") == 0)
-    //     m_Exposure = fValue;
-    else
         return CCodec_DXTC::SetParameter(pszParamName, fValue);
-    return true;
 }
 
 CCodec_BC6H::~CCodec_BC6H()
