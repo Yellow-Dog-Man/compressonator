@@ -416,8 +416,7 @@ CodecError CCodec_BC6H::CFinishBC6HEncoding(void)
         return CE_Unknown;
     }
 
-    if (m_Use_MultiThreading)
-    {
+    
         // Wait for all the live threads to finish any current work
         for (DWORD i = 0; i < m_LiveThreads; i++)
         {
@@ -428,7 +427,7 @@ CodecError CCodec_BC6H::CFinishBC6HEncoding(void)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
-    }
+
     return CE_OK;
 }
 
