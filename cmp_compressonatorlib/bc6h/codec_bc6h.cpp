@@ -147,7 +147,7 @@ bool CCodec_BC6H::SetParameter(const CMP_CHAR* pszParamName, CMP_DWORD dwValue)
 
 bool CCodec_BC6H::SetParameter(const CMP_CHAR* pszParamName, CODECFLOAT fValue)
 {
-        return CCodec_DXTC::SetParameter(pszParamName, fValue);
+    return CCodec_DXTC::SetParameter(pszParamName, fValue);
 }
 
 CCodec_BC6H::~CCodec_BC6H()
@@ -227,7 +227,6 @@ CCodec_BC6H::~CCodec_BC6H()
 
 CodecError CCodec_BC6H::CInitializeBC6HLibrary()
 {
-    PrintInfo("Initialize BC6H\n");
     if (!m_LibraryInitialized)
     {
         for (DWORD i = 0; i < BC6H_MAX_THREADS; i++)
@@ -267,7 +266,10 @@ CodecError CCodec_BC6H::CInitializeBC6HLibrary()
             return CE_Unknown;
         }
 
-        PrintInfo("Encoding Threads: %d\n", m_NumEncodingThreads);
+#ifdef USE_DBGTRACE
+        DbgTrace("BC6H Encoding Threads: %d\n", m_NumEncodingThreads);
+        DbgTrace("BC6H Encoding Quality: %f\n", m_fQuality);
+#endif
 
         for (int i = 0; i < m_NumEncodingThreads; i++)
         {
@@ -395,18 +397,17 @@ CodecError CCodec_BC6H::CFinishBC6HEncoding(void)
     {
         return CE_Unknown;
     }
-
     
-        // Wait for all the live threads to finish any current work
-        for (DWORD i = 0; i < m_LiveThreads; i++)
+    // Wait for all the live threads to finish any current work
+    for (DWORD i = 0; i < m_LiveThreads; i++)
+    {
+        // If a thread is in the running state then we need to wait for it to finish
+        // its work from the producer
+        while (m_EncodeParameterStorage[i].run == TRUE)
         {
-            // If a thread is in the running state then we need to wait for it to finish
-            // its work from the producer
-            while (m_EncodeParameterStorage[i].run == TRUE)
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
+    }
 
     return CE_OK;
 }
