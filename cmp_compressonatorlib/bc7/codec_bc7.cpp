@@ -90,7 +90,7 @@ CCodec_BC7::CCodec_BC7()
 
     m_Use_MultiThreading = true;
     m_ModeMask           = 0xCF;  // If you reset this default: seach for comments with dwmodeMask and change the values also
-    m_Quality            = AMD_CODEC_QUALITY_DEFAULT;
+    m_fQuality            = AMD_CODEC_QUALITY_DEFAULT;
     m_Performance        = 1.00;
     m_ColourRestrict     = FALSE;
     m_AlphaRestrict      = FALSE;
@@ -125,14 +125,6 @@ bool CCodec_BC7::SetParameter(const CMP_CHAR* pszParamName, CMP_CHAR* sValue)
         m_NumThreads         = (CMP_BYTE)std::stoi(sValue) & 0xFF;
         m_Use_MultiThreading = m_NumThreads != 1;
         //printf("BC7 CPU set threads = %d\n",m_NumThreads);
-    }
-    if (strcmp(pszParamName, "Quality") == 0)
-    {
-        m_Quality = std::stof(sValue);
-        if ((m_Quality < 0) || (m_Quality > 1.0))
-        {
-            return false;
-        }
     }
     else if (strcmp(pszParamName, "Performance") == 0)
     {
@@ -169,9 +161,7 @@ bool CCodec_BC7::SetParameter(const CMP_CHAR* pszParamName, CMP_DWORD dwValue)
 
 bool CCodec_BC7::SetParameter(const CMP_CHAR* pszParamName, CODECFLOAT fValue)
 {
-    if (strcmp(pszParamName, "Quality") == 0)
-        m_Quality = fValue;
-    else if (strcmp(pszParamName, "Performance") == 0)
+    if (strcmp(pszParamName, "Performance") == 0)
         m_Performance = fValue;
     else
         return CCodec_DXTC::SetParameter(pszParamName, fValue);
@@ -180,79 +170,76 @@ bool CCodec_BC7::SetParameter(const CMP_CHAR* pszParamName, CODECFLOAT fValue)
 
 CCodec_BC7::~CCodec_BC7()
 {
-    if (m_LibraryInitialized)
+    if (!m_LibraryInitialized)
+        return;
+
+    // Tell all the live threads that they can exit when they have finished any current work
+    for (int i = 0; i < m_LiveThreads; i++)
     {
-        if (m_Use_MultiThreading)
-        {
-            // Tell all the live threads that they can exit when they have finished any current work
-            for (int i = 0; i < m_LiveThreads; i++)
-            {
-                // If a thread is in the running state then we need to wait for it to finish
-                // any queued work from the producer before we can tell it to exit.
-                //
-                // If we don't wait then there is a race condition here where we have
-                // told the thread to run but it hasn't yet been scheduled - if we set
-                // the exit flag before it runs then its block will not be processed.
+        // If a thread is in the running state then we need to wait for it to finish
+        // any queued work from the producer before we can tell it to exit.
+        //
+        // If we don't wait then there is a race condition here where we have
+        // told the thread to run but it hasn't yet been scheduled - if we set
+        // the exit flag before it runs then its block will not be processed.
 #pragma warning(push)
 #pragma warning(disable : 4127)  //warning C4127: conditional expression is constant
-                while (1)
-                {
-                    if (m_EncodeParameterStorage[i].run != TRUE)
-                    {
-                        break;
-                    }
-                }
+        while (1)
+        {
+            if (m_EncodeParameterStorage[i].run != TRUE)
+            {
+                break;
+            }
+        }
 #pragma warning(pop)
-                // Signal to the thread that it can exit
-                m_EncodeParameterStorage[i].exit = TRUE;
-            }
-
-            // Now wait for all threads to have exited
-            if (m_LiveThreads > 0)
-            {
-                for (CMP_DWORD dwThread = 0; dwThread < m_LiveThreads; dwThread++)
-                {
-                    std::thread& curThread = m_EncodingThreadHandle[dwThread];
-
-                    curThread.join();
-                }
-            }
-
-            for (unsigned int i = 0; i < m_LiveThreads; i++)
-            {
-                std::thread& curThread = m_EncodingThreadHandle[i];
-
-                curThread = std::thread();
-            }
-
-            delete[] m_EncodingThreadHandle;
-        }  // MultiThreading
-
-        m_EncodingThreadHandle = NULL;
-
-        if (m_EncodeParameterStorage)
-            delete[] m_EncodeParameterStorage;
-        m_EncodeParameterStorage = NULL;
-
-        for (int i = 0; i < m_NumEncodingThreads; i++)
-        {
-            if (m_encoder[i])
-            {
-                delete m_encoder[i];
-                m_encoder[i] = NULL;
-            }
-        }
-
-        if (m_decoder)
-        {
-            delete m_decoder;
-            m_decoder = NULL;
-        }
-
-        Quant_DeInit();
-
-        m_LibraryInitialized = false;
+        // Signal to the thread that it can exit
+        m_EncodeParameterStorage[i].exit = TRUE;
     }
+
+    // Now wait for all threads to have exited
+    if (m_LiveThreads > 0)
+    {
+        for (CMP_DWORD dwThread = 0; dwThread < m_LiveThreads; dwThread++)
+        {
+            std::thread& curThread = m_EncodingThreadHandle[dwThread];
+
+            curThread.join();
+        }
+    }
+
+    for (unsigned int i = 0; i < m_LiveThreads; i++)
+    {
+        std::thread& curThread = m_EncodingThreadHandle[i];
+
+        curThread = std::thread();
+    }
+
+    delete[] m_EncodingThreadHandle;
+
+    m_EncodingThreadHandle = NULL;
+
+    if (m_EncodeParameterStorage)
+        delete[] m_EncodeParameterStorage;
+    m_EncodeParameterStorage = NULL;
+
+    for (int i = 0; i < m_NumEncodingThreads; i++)
+    {
+        if (m_encoder[i])
+        {
+            delete m_encoder[i];
+            m_encoder[i] = NULL;
+        }
+    }
+
+    if (m_decoder)
+    {
+        delete m_decoder;
+        m_decoder = NULL;
+    }
+
+    Quant_DeInit();
+
+    m_LibraryInitialized = false;
 }
 
 CodecError CCodec_BC7::InitializeBC7Library()
@@ -302,7 +289,7 @@ CodecError CCodec_BC7::InitializeBC7Library()
         for (i = 0; i < m_NumEncodingThreads; i++)
         {
             // Create single encoder instance
-            m_encoder[i] = new BC7BlockEncoder(m_ModeMask, m_ImageNeedsAlpha, m_Quality, m_ColourRestrict, m_AlphaRestrict, m_Performance);
+            m_encoder[i] = new BC7BlockEncoder(m_ModeMask, m_ImageNeedsAlpha, m_fQuality, m_ColourRestrict, m_AlphaRestrict, m_Performance);
 
             // Cleanup if problem!
             if (!m_encoder[i])
@@ -430,17 +417,14 @@ CodecError CCodec_BC7::FinishBC7Encoding(void)
         return CE_Unknown;
     }
 
-    if (m_Use_MultiThreading)
+    // Wait for all the live threads to finish any current work
+    for (CMP_DWORD i = 0; i < m_LiveThreads; i++)
     {
-        // Wait for all the live threads to finish any current work
-        for (CMP_DWORD i = 0; i < m_LiveThreads; i++)
+        // If a thread is in the running state then we need to wait for it to finish
+        // its work from the producer
+        while (m_EncodeParameterStorage[i].run == TRUE)
         {
-            // If a thread is in the running state then we need to wait for it to finish
-            // its work from the producer
-            while (m_EncodeParameterStorage[i].run == TRUE)
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
     return CE_OK;

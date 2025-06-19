@@ -35,3 +35,6 @@ internal/tests/scripts/temp/*
 __pycache__
 *.aps
 transcode_temp.dds
+
+# Until I can figure out, how to modify the output files to be relative, they export with absoloute file paths, so we shouldn't check them in.
+build_cli/*
