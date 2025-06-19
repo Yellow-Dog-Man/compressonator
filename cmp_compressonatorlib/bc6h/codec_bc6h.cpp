@@ -152,191 +152,188 @@ bool CCodec_BC6H::SetParameter(const CMP_CHAR* pszParamName, CODECFLOAT fValue)
 
 CCodec_BC6H::~CCodec_BC6H()
 {
-    if (m_LibraryInitialized)
+    if (!m_LibraryInitialized)
+        return;
+
+    // Tell all the live threads that they can exit when they have finished any current work
+    for (int i = 0; i < m_LiveThreads; i++)
     {
-        
-        // Tell all the live threads that they can exit when they have finished any current work
-        for (int i = 0; i < m_LiveThreads; i++)
-        {
-            // If a thread is in the running state then we need to wait for it to finish
-            // any queued work from the producer before we can tell it to exit.
-            //
-            // If we don't wait then there is a race condition here where we have
-            // told the thread to run but it hasn't yet been scheduled - if we set
-            // the exit flag before it runs then its block will not be processed.
+        // If a thread is in the running state then we need to wait for it to finish
+        // any queued work from the producer before we can tell it to exit.
+        //
+        // If we don't wait then there is a race condition here where we have
+        // told the thread to run but it hasn't yet been scheduled - if we set
+        // the exit flag before it runs then its block will not be processed.
 #pragma warning(push)
 #pragma warning(disable : 4127)  //warning C4127: conditional expression is constant
-            while (1)
+        while (1)
+        {
+            if (m_EncodeParameterStorage == NULL)
+                break;
+            if (m_EncodeParameterStorage[i].run != TRUE)
             {
-                if (m_EncodeParameterStorage == NULL)
-                    break;
-                if (m_EncodeParameterStorage[i].run != TRUE)
-                {
-                    break;
-                }
+                break;
             }
+        }
 #pragma warning(pop)
-            // Signal to the thread that it can exit
+        // Signal to the thread that it can exit 
+        if (m_EncodeParameterStorage != NULL)
             m_EncodeParameterStorage[i].exit = TRUE;
-        }
-
-        // Now wait for all threads to have exited
-        if (m_LiveThreads > 0)
-        {
-            for (DWORD dwThread = 0; dwThread < m_LiveThreads; dwThread++)
-            {
-                std::thread& curThread = m_EncodingThreadHandle[dwThread];
-
-                curThread.join();
-            }
-        }
-
-        for (unsigned int i = 0; i < m_LiveThreads; i++)
-        {
-            std::thread& curThread = m_EncodingThreadHandle[i];
-
-            curThread = std::thread();
-        }
-
-        delete[] m_EncodingThreadHandle;
-
-        m_EncodingThreadHandle = NULL;
-
-        if (m_EncodeParameterStorage)
-            delete[] m_EncodeParameterStorage;
-        m_EncodeParameterStorage = NULL;
-
-        for (int i = 0; i < m_NumEncodingThreads; i++)
-        {
-            if (m_encoder[i])
-            {
-                delete m_encoder[i];
-                m_encoder[i] = NULL;
-            }
-        }
-
-        if (m_decoder)
-        {
-            delete m_decoder;
-            m_decoder = NULL;
-        }
-
-        m_LibraryInitialized = false;
     }
+
+
+    for (DWORD dwThread = 0; dwThread < m_LiveThreads; dwThread++)
+    {
+        std::thread& curThread = m_EncodingThreadHandle[dwThread];
+
+        curThread.join();
+    }
+
+    for (unsigned int i = 0; i < m_LiveThreads; i++)
+    {
+        std::thread& curThread = m_EncodingThreadHandle[i];
+
+        curThread = std::thread();
+    }
+
+    // Clear storage of threads
+    delete[] m_EncodingThreadHandle;
+    m_EncodingThreadHandle = NULL;
+
+    if (m_EncodeParameterStorage)
+        delete[] m_EncodeParameterStorage;
+    m_EncodeParameterStorage = NULL;
+
+    // Delete encoders
+    for (int i = 0; i < m_NumEncodingThreads; i++)
+    {
+        if (m_encoder[i])
+        {
+            delete m_encoder[i];
+            m_encoder[i] = NULL;
+        }
+    }
+
+    if (m_decoder)
+    {
+        delete m_decoder;
+        m_decoder = NULL;
+    }
+
+    m_LibraryInitialized = false;
 }
 
 CodecError CCodec_BC6H::CInitializeBC6HLibrary()
 {
-    if (!m_LibraryInitialized)
+    if (m_LibraryInitialized)
+        return CE_OK;
+
+    for (DWORD i = 0; i < BC6H_MAX_THREADS; i++)
     {
-        for (DWORD i = 0; i < BC6H_MAX_THREADS; i++)
-        {
-            m_encoder[i] = NULL;
-        }
+        m_encoder[i] = NULL;
+    }
 
-        // Create threaded encoder instances
-        m_LiveThreads        = 0;
-        m_LastThread         = 0;
-        m_NumEncodingThreads = cmp_minT(m_NumThreads, BC6H_MAX_THREADS);
-        if (m_NumEncodingThreads == 0)
-        {
-            m_NumEncodingThreads = CMP_GetNumberOfProcessors();
-            if (m_NumEncodingThreads <= 2)
-                m_NumEncodingThreads = 8;  // fallback to a default!
-            if (m_NumEncodingThreads > 128)
-                m_NumEncodingThreads = 128;
-        }
-        m_Use_MultiThreading = (m_NumEncodingThreads != 1);
+    // Create threaded encoder instances
+    m_LiveThreads        = 0;
+    m_LastThread         = 0;
+    m_NumEncodingThreads = cmp_minT(m_NumThreads, BC6H_MAX_THREADS);
+    if (m_NumEncodingThreads == 0)
+    {
+        m_NumEncodingThreads = CMP_GetNumberOfProcessors();
+        if (m_NumEncodingThreads <= 2)
+            m_NumEncodingThreads = 8;  // fallback to a default!
+        if (m_NumEncodingThreads > 128)
+            m_NumEncodingThreads = 128;
+    }
+    m_Use_MultiThreading = (m_NumEncodingThreads != 1);
 
-        m_EncodeParameterStorage = new BC6HEncodeThreadParam[m_NumEncodingThreads];
-        if (!m_EncodeParameterStorage)
-        {
-            return CE_Unknown;
-        }
+    m_EncodeParameterStorage = new BC6HEncodeThreadParam[m_NumEncodingThreads];
+    if (!m_EncodeParameterStorage)
+    {
+        return CE_Unknown;
+    }
 
-        for (int i = 0; i < m_NumEncodingThreads; i++)
-            m_EncodeParameterStorage[i].run = false;
+    for (int i = 0; i < m_NumEncodingThreads; i++)
+        m_EncodeParameterStorage[i].run = false;
 
-        m_EncodingThreadHandle = new std::thread[m_NumEncodingThreads];
-        if (!m_EncodingThreadHandle)
+    m_EncodingThreadHandle = new std::thread[m_NumEncodingThreads];
+    if (!m_EncodingThreadHandle)
+    {
+        delete[] m_EncodeParameterStorage;
+        m_EncodeParameterStorage = NULL;
+
+        return CE_Unknown;
+    }
+
+#ifdef USE_DBGTRACE
+    DbgTrace("BC6H Encoding Threads: %d\n", m_NumEncodingThreads);
+    DbgTrace("BC6H Encoding Quality: %f\n", m_fQuality);
+#endif
+
+    for (int i = 0; i < m_NumEncodingThreads; i++)
+    {
+        // Create single encoder instance
+        CMP_BC6H_BLOCK_PARAMETERS user_options;
+
+        user_options.bIsSigned      = m_bIsSigned;
+        user_options.fQuality       = m_fQuality;
+        user_options.dwMask         = m_ModeMask;
+        user_options.fExposure      = m_Exposure;
+        user_options.bUsePatternRec = m_UsePatternRec;
+
+        m_encoder[i] = new BC6HBlockEncoder(user_options);
+
+        // Cleanup if problem!
+        if (!m_encoder[i])
         {
-            delete[] m_EncodeParameterStorage;
+            if (m_EncodeParameterStorage)
+                delete[] m_EncodeParameterStorage;
             m_EncodeParameterStorage = NULL;
 
-            return CE_Unknown;
-        }
+            delete[] m_EncodingThreadHandle;
+            m_EncodingThreadHandle = NULL;
 
-#ifdef USE_DBGTRACE
-        DbgTrace("BC6H Encoding Threads: %d\n", m_NumEncodingThreads);
-        DbgTrace("BC6H Encoding Quality: %f\n", m_fQuality);
-#endif
-
-        for (int i = 0; i < m_NumEncodingThreads; i++)
-        {
-            // Create single encoder instance
-            CMP_BC6H_BLOCK_PARAMETERS user_options;
-
-            user_options.bIsSigned      = m_bIsSigned;
-            user_options.fQuality       = m_fQuality;
-            user_options.dwMask         = m_ModeMask;
-            user_options.fExposure      = m_Exposure;
-            user_options.bUsePatternRec = m_UsePatternRec;
-
-            m_encoder[i] = new BC6HBlockEncoder(user_options);
-
-            // Cleanup if problem!
-            if (!m_encoder[i])
-            {
-                if (m_EncodeParameterStorage)
-                    delete[] m_EncodeParameterStorage;
-                m_EncodeParameterStorage = NULL;
-
-                delete[] m_EncodingThreadHandle;
-                m_EncodingThreadHandle = NULL;
-
-                for (int j = 0; j < i; j++)
-                {
-                    delete m_encoder[j];
-                    m_encoder[j] = NULL;
-                }
-
-                return CE_Unknown;
-            }
-
-#ifdef USE_DBGTRACE
-            DbgTrace(("Encoder[%d]:ModeMask %X, Quality %f\n", i, m_ModeMask, m_fQuality));
-#endif
-        }
-        
-        // Create the encoding threads
-        for (CMP_INT i = 0; i < m_NumEncodingThreads; i++)
-        {
-            // Initialize thread parameters.
-            m_EncodeParameterStorage[i].encoder = m_encoder[i];
-            // Inform the thread that at the moment it doesn't have any work to do
-            // but that it should wait for some and not exit
-            m_EncodeParameterStorage[i].run  = FALSE;
-            m_EncodeParameterStorage[i].exit = FALSE;
-
-            m_EncodingThreadHandle[i] = std::thread(BC6HThreadProcEncode, (void*)&m_EncodeParameterStorage[i]);
-            m_LiveThreads++;
-        }
-
-        // Create single decoder instance
-        m_decoder = new BC6HBlockDecoder();
-        if (!m_decoder)
-        {
-            for (CMP_INT j = 0; j < m_NumEncodingThreads; j++)
+            for (int j = 0; j < i; j++)
             {
                 delete m_encoder[j];
                 m_encoder[j] = NULL;
             }
+
             return CE_Unknown;
         }
 
-        m_LibraryInitialized = true;
+#ifdef USE_DBGTRACE
+        DbgTrace(("Encoder[%d]:ModeMask %X, Quality %f\n", i, m_ModeMask, m_fQuality));
+#endif
     }
-    return CE_OK;
+        
+    // Create the encoding threads
+    for (CMP_INT i = 0; i < m_NumEncodingThreads; i++)
+    {
+        // Initialize thread parameters.
+        m_EncodeParameterStorage[i].encoder = m_encoder[i];
+        // Inform the thread that at the moment it doesn't have any work to do
+        // but that it should wait for some and not exit
+        m_EncodeParameterStorage[i].run  = FALSE;
+        m_EncodeParameterStorage[i].exit = FALSE;
+
+        m_EncodingThreadHandle[i] = std::thread(BC6HThreadProcEncode, (void*)&m_EncodeParameterStorage[i]);
+        m_LiveThreads++;
+    }
+
+    // Create single decoder instance
+    m_decoder = new BC6HBlockDecoder();
+    if (!m_decoder)
+    {
+        for (CMP_INT j = 0; j < m_NumEncodingThreads; j++)
+        {
+            delete m_encoder[j];
+            m_encoder[j] = NULL;
+        }
+        return CE_Unknown;
+    }
+
+    m_LibraryInitialized = true;
 }
 
 CodecError CCodec_BC6H::CEncodeBC6HBlock(float in[MAX_SUBSET_SIZE][MAX_DIMENSION_BIG], BYTE* out)
