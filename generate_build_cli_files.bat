@@ -1,5 +1,5 @@
 @REM Need opencv 4.2.0
-set OPENCV_DIR="D:/downloads/opencv/"
+@REM AND OPENCV_DIR env set
 
 mkdir -f build_cli
 cd build_cli
