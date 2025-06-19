@@ -92,7 +92,6 @@ private:
 
     // BC7 User configurable variables
     CMP_DWORD m_ModeMask;
-    double    m_Quality;
     double    m_Performance;
     CMP_BOOL  m_ColourRestrict;
     CMP_BOOL  m_AlphaRestrict;

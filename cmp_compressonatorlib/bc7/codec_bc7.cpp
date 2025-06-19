@@ -90,7 +90,7 @@ CCodec_BC7::CCodec_BC7()
 
     m_Use_MultiThreading = true;
     m_ModeMask           = 0xCF;  // If you reset this default: seach for comments with dwmodeMask and change the values also
-    m_Quality            = AMD_CODEC_QUALITY_DEFAULT;
+    m_fQuality            = AMD_CODEC_QUALITY_DEFAULT;
     m_Performance        = 1.00;
     m_ColourRestrict     = FALSE;
     m_AlphaRestrict      = FALSE;
@@ -125,14 +125,6 @@ bool CCodec_BC7::SetParameter(const CMP_CHAR* pszParamName, CMP_CHAR* sValue)
         m_NumThreads         = (CMP_BYTE)std::stoi(sValue) & 0xFF;
         m_Use_MultiThreading = m_NumThreads != 1;
         //printf("BC7 CPU set threads = %d\n",m_NumThreads);
-    }
-    if (strcmp(pszParamName, "Quality") == 0)
-    {
-        m_Quality = std::stof(sValue);
-        if ((m_Quality < 0) || (m_Quality > 1.0))
-        {
-            return false;
-        }
     }
     else if (strcmp(pszParamName, "Performance") == 0)
     {
@@ -169,9 +161,7 @@ bool CCodec_BC7::SetParameter(const CMP_CHAR* pszParamName, CMP_DWORD dwValue)
 
 bool CCodec_BC7::SetParameter(const CMP_CHAR* pszParamName, CODECFLOAT fValue)
 {
-    if (strcmp(pszParamName, "Quality") == 0)
-        m_Quality = fValue;
-    else if (strcmp(pszParamName, "Performance") == 0)
+    if (strcmp(pszParamName, "Performance") == 0)
         m_Performance = fValue;
     else
         return CCodec_DXTC::SetParameter(pszParamName, fValue);
@@ -299,7 +289,7 @@ CodecError CCodec_BC7::InitializeBC7Library()
         for (i = 0; i < m_NumEncodingThreads; i++)
         {
             // Create single encoder instance
-            m_encoder[i] = new BC7BlockEncoder(m_ModeMask, m_ImageNeedsAlpha, m_Quality, m_ColourRestrict, m_AlphaRestrict, m_Performance);
+            m_encoder[i] = new BC7BlockEncoder(m_ModeMask, m_ImageNeedsAlpha, m_fQuality, m_ColourRestrict, m_AlphaRestrict, m_Performance);
 
             // Cleanup if problem!
             if (!m_encoder[i])
