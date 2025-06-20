@@ -66,4 +66,4 @@ jobs:
         with:
           if-no-files-found: error
           name: windows-lib
-          path: results/
+          path: results/**/*.dll
