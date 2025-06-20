@@ -389,6 +389,8 @@ CMP_ERROR CMP_API CMP_CompressTexture(KernelOptions* options, CMP_MipSet srcMipS
 {
     CMP_ERROR result;
 
+    printf("CMP_CompressTexture\n");
+
     if (g_ComputeBase)
     {
         result = g_ComputeBase->TC_Compress(options, srcMipSet, dstMipSet, pFeedback);
@@ -557,6 +559,7 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
                 cmp_mutex.unlock();
                 return CMP_ERR_FAILED_HOST_SETUP;
             }
+
             printf("Hello just before CMP_CompressTexture\n");
 
             // Do the compression

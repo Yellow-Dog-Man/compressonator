@@ -3512,6 +3512,8 @@ void CompressBlockBC6_Internal(CMP_GLOBAL unsigned char*     outdata,
         BC6HEncode_local->d_shape_index = bestShape;
     }
 
+    printf("BC6H_CompressBlock - 3515\n");
+
     // run through 32 possible partition set
     for (CGU_INT8 shape = 0; shape < MAX_BC6H_PARTITIONS; shape++)
     {
@@ -3540,7 +3542,7 @@ void CompressBlockBC6_Internal(CMP_GLOBAL unsigned char*     outdata,
             }
         }
     }
-
+    printf("BC6H_compressblock  - 3545\n");
     bestError = EncodePattern(BC6HEncode_local, bestError);
 
     // used for debugging modes, set the value you want to debug with

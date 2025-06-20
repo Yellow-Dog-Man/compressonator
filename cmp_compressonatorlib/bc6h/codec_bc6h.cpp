@@ -273,6 +273,8 @@ CodecError CCodec_BC6H::CInitializeBC6HLibrary()
     DbgTrace("BC6H Encoding Quality: %f\n", m_fQuality);
 #endif
 
+    printf("Initialize BC6H Library: %d\n", m_NumEncodingThreads);
+
     for (int i = 0; i < m_NumEncodingThreads; i++)
     {
         // Create single encoder instance

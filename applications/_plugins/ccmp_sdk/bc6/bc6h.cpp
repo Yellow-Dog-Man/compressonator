@@ -160,6 +160,7 @@ int BC6H_EncodeClass::DecompressBlock(unsigned int xBlock, unsigned int yBlock, 
 
 int BC6H_EncodeClass::CompressTexture(void* srcin, void* cmpout, void* processOptions)
 {
+    printf("BC6H_EncodeClass\n");
     // ToDo: Implement texture level compression
     if (processOptions == NULL)
         return -1;
@@ -228,6 +229,7 @@ int BC6H_EncodeClass::CompressBlock(void* in, void* out, void* blockoptions)
 
 int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, void* srcin, void* cmpout)
 {
+    printf("BC6H_CompressBlock\n");
     CMP_HALF* p_source_pixels = (CMP_HALF*)srcin;
     if ((m_srcHeight == 0) || (m_srcWidth == 0))
     {
@@ -247,6 +249,8 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
 
     unsigned int destI  = (xBlock * COMPRESSED_BLOCK_SIZE) + (yBlock * width_in_blocks * COMPRESSED_BLOCK_SIZE);
     unsigned int srcidx = 0;
+
+    printf("BC6H_CompressBlock - 253\n");
 
     //Check if it is a complete 4X4 block
     if (((xBlock + 1) * BlockX <= m_srcWidth) && ((yBlock + 1) * BlockY <= m_srcHeight))
@@ -293,6 +297,7 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
     }
     else
     {
+        printf("BC6H_CompressBlock - 300\n");
         CMP_DWORD dwWidth = CMP_MIN(static_cast<unsigned int>(BlockX), m_srcWidth - xBlock * BlockX);  //x block width
         CMP_DWORD i, j, srcIndex;
 
@@ -341,7 +346,7 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
         if (j < BlockY)
             PadBlock(j, BlockX, BlockY, 4, (CMP_FLOAT*)BC6HEncode_local.din);
     }
-
+    printf("BC6H_CompressBlock - 349\n");
     CompressBlockBC6_Internal((unsigned char*)cmpout, destI, &BC6HEncode_local, &g_BC6HEncode);
     return (0);
 }
