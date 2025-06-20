@@ -229,7 +229,6 @@ int BC6H_EncodeClass::CompressBlock(void* in, void* out, void* blockoptions)
 
 int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, void* srcin, void* cmpout)
 {
-    printf("BC6H_CompressBlock\n");
     CMP_HALF* p_source_pixels = (CMP_HALF*)srcin;
     if ((m_srcHeight == 0) || (m_srcWidth == 0))
     {
@@ -250,15 +249,11 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
     unsigned int destI  = (xBlock * COMPRESSED_BLOCK_SIZE) + (yBlock * width_in_blocks * COMPRESSED_BLOCK_SIZE);
     unsigned int srcidx = 0;
 
-    printf("BC6H_CompressBlock - 253\n");
-
     //Check if it is a complete 4X4 block
     if (((xBlock + 1) * BlockX <= m_srcWidth) && ((yBlock + 1) * BlockY <= m_srcHeight))
     {
-        printf("BC6H_CompressBlock - 258\n");
         for (int i = 0; i < BlockX; i++)
         {
-            printf("BC6H_CompressBlock - BlockX Loop %d \n", i);
             srcidx = i * stride;
             for (int j = 0; j < BlockY; j++)
             {
