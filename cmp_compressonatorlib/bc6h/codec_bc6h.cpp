@@ -341,6 +341,8 @@ CodecError CCodec_BC6H::CInitializeBC6HLibrary()
     }
 
     m_LibraryInitialized = true;
+
+    return CE_OK;
 }
 
 CodecError CCodec_BC6H::CEncodeBC6HBlock(float in[MAX_SUBSET_SIZE][MAX_DIMENSION_BIG], BYTE* out)
