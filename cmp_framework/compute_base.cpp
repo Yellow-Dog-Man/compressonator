@@ -498,8 +498,9 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             destTexture.dwWidth      = pInMipLevel->m_nWidth;
             destTexture.dwHeight     = pInMipLevel->m_nHeight;
             destTexture.dwPitch      = 0;
-            destTexture.nBlockWidth  = srcMipSet->m_nBlockWidth;
-            destTexture.nBlockHeight = srcMipSet->m_nBlockHeight;
+            destTexture.nBlockWidth  = dstMipSet->m_nBlockWidth;
+            destTexture.nBlockHeight = dstMipSet->m_nBlockHeight;
+            destTexture.nBlockDepth  = dstMipSet->m_nBlockDepth;
             destTexture.format       = dstMipSet->m_format;
             destTexture.dwDataSize   = CMP_CalculateBufferSize(&destTexture);
 
@@ -528,9 +529,6 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             ComputeOptions options;
             options.force_rebuild = false;  // set this to true if you want the shader source code  to be allways compiled!
 
-            printf("Hello just before CMP_CreateComputeLibrary\n");
-            printf("Mip: %d Format: %d", nMipLevel, dstMipSet->m_format);
-
             //===============================================================================
             // Initalize the  Pipeline that will be used for the codec to run on HPC or GPU
             //===============================================================================
@@ -556,8 +554,6 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
                 return CMP_ERR_FAILED_HOST_SETUP;
             }
 
-            printf("Hello just before CMP_CompressTexture\n");
-
             // Do the compression
             if (CMP_CompressTexture(&kernelOptions, *srcMipSet, *dstMipSet, pFeedbackProc) != CMP_OK)
             {
@@ -567,8 +563,6 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
                 cmp_mutex.unlock();
                 return CMP_ERR_FAILED_HOST_SETUP;
             }
-
-            printf("Hello just after CMP_CompressTexture\n");
 
             // Get Performance Stats
             if (kernelOptions.getPerfStats)
@@ -581,14 +575,12 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             // Close the Pipeline with option to cache as needed
             //===============================================================================
             CMP_DestroyComputeLibrary(true);
-            printf("DESTROY LIBRARY\n");
         }
     }
 
     //if (pFeedbackProc)
     //    pFeedbackProc(100, NULL, NULL);
 
-    printf("MUTEX\n");
     cmp_mutex.unlock();
     return CMP_OK;
 }
