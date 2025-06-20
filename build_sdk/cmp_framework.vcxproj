@@ -179,6 +179,7 @@
     <RootNamespace>CompressonatorLib</RootNamespace>
     <ProjectName>CMP_Framework</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <DebugSymbols>All</DebugSymbols>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)/Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -1147,6 +1148,8 @@
       <StringPooling>true</StringPooling>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_MD_DLL.pdb</ProgramDataBaseFileName>
+      <DebugSymbols>All</DebugSymbols>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
