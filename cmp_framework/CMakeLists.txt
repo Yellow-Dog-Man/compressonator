@@ -7,6 +7,7 @@ if(CMP_HOST_WINDOWS)
     target_compile_definitions(CMP_Framework PUBLIC
         -DCMP_USE_XMMINTRIN
     )
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 file(GLOB_RECURSE HALF_SRC
