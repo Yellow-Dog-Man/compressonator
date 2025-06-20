@@ -262,11 +262,9 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
             srcidx = i * stride;
             for (int j = 0; j < BlockY; j++)
             {
-                printf("BC6H_CompressBlock - BlockY Loop %d \n", j);
                 CMP_HALF srcpix                         = p_source_pixels[srcOffset + srcidx++];
                 BC6HEncode_local.din[i * BlockX + j][0] = (srcpix).bits();
 
-                printf("BC6H_CompressBlock - BlockY Loop %d 269 \n", j);
                 if ((srcpix).isNan() || srcpix < 0.00001f)
                 {
                     if (g_BC6HEncode.m_isSigned)
@@ -275,7 +273,6 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
                         BC6HEncode_local.din[i * BlockX + j][0] = 0.0;
                 }
 
-                printf("BC6H_CompressBlock - BlockY Loop %d 278 \n", j);
                 srcpix                                  = p_source_pixels[srcOffset + srcidx++];
                 BC6HEncode_local.din[i * BlockX + j][1] = (srcpix).bits();
                 if ((srcpix).isNan() || srcpix < 0.00001f)
@@ -285,7 +282,7 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
                     else
                         BC6HEncode_local.din[i * BlockX + j][1] = 0.0;
                 }
-                printf("BC6H_CompressBlock - BlockY Loop %d 288 \n", j);
+
                 srcpix                                  = p_source_pixels[srcOffset + srcidx++];
                 BC6HEncode_local.din[i * BlockX + j][2] = (srcpix).bits();
                 if ((srcpix).isNan() || srcpix < 0.00001f)
@@ -295,7 +292,7 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
                     else
                         BC6HEncode_local.din[i * BlockX + j][2] = 0.0;
                 }
-                printf("BC6H_CompressBlock - BlockY Loop %d 298 \n", j);
+
                 BC6HEncode_local.din[i * BlockX + j][3] = 0.0;  //force alpha channel to 0.0 as bc6 does not process alpha channel
                 srcidx++;                                       //skip alpha channel
             }
