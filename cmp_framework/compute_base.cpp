@@ -437,7 +437,7 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
     dstMipSet->m_format  = kernelOptions.format;
     dstMipSet->m_nHeight = srcMipSet->m_nHeight;
     dstMipSet->m_nWidth  = srcMipSet->m_nWidth;
-    printf("FORMAT 2FOURCC\n");
+
     CMP_Format2FourCC(dstMipSet->m_format, dstMipSet);
 
     //=====================================================
@@ -460,15 +460,11 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
         return CMP_ERR_MEM_ALLOC_FOR_MIPSET;
     }
 
-    printf("AFTER ALLOCATE\n");
-
     CMP_Texture srcTexture;
     srcTexture.dwSize = sizeof(srcTexture);
     int DestMipLevel  = srcMipSet->m_nMipLevels;
 
     dstMipSet->m_nMipLevels = DestMipLevel;
-
-    printf("MIPLOOOOOP\n");
 
     for (int nMipLevel = 0; nMipLevel < DestMipLevel; nMipLevel++)
     {

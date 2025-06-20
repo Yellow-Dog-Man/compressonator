@@ -160,7 +160,6 @@ int BC6H_EncodeClass::DecompressBlock(unsigned int xBlock, unsigned int yBlock, 
 
 int BC6H_EncodeClass::CompressTexture(void* srcin, void* cmpout, void* processOptions)
 {
-    printf("BC6H_EncodeClass\n");
     // ToDo: Implement texture level compression
     if (processOptions == NULL)
         return -1;
