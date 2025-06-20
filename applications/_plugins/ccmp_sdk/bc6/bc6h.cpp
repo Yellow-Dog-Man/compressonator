@@ -298,7 +298,6 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
     }
     else
     {
-        printf("BC6H_CompressBlock - 300\n");
         CMP_DWORD dwWidth = CMP_MIN(static_cast<unsigned int>(BlockX), m_srcWidth - xBlock * BlockX);  //x block width
         CMP_DWORD i, j, srcIndex;
 
@@ -347,7 +346,7 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
         if (j < BlockY)
             PadBlock(j, BlockX, BlockY, 4, (CMP_FLOAT*)BC6HEncode_local.din);
     }
-    printf("BC6H_CompressBlock - 349\n");
+
     CompressBlockBC6_Internal((unsigned char*)cmpout, destI, &BC6HEncode_local, &g_BC6HEncode);
     return (0);
 }
