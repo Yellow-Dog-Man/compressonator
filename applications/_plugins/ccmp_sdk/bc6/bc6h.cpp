@@ -258,6 +258,9 @@ int BC6H_EncodeClass::CompressBlock(unsigned int xBlock, unsigned int yBlock, vo
             for (int j = 0; j < BlockY; j++)
             {
                 CMP_HALF srcpix                         = p_source_pixels[srcOffset + srcidx++];
+                if (srcpix == NULL)
+                    continue;
+
                 BC6HEncode_local.din[i * BlockX + j][0] = (srcpix).bits();
 
                 if ((srcpix).isNan() || srcpix < 0.00001f)
