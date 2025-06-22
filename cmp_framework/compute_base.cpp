@@ -531,7 +531,7 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             //===============================================================================
             if (CMP_CreateComputeLibrary(srcMipSet, &kernelOptions, &CMips) != CMP_OK)
             {
-                printf("Failed to init HOST Lib. CPU will be used for compression\n");
+                PrintInfo("Failed to init HOST Lib. CPU will be used for compression\n");
                 cmp_mutex.unlock();
                 return CMP_ERR_FAILED_HOST_SETUP;
             }
@@ -546,7 +546,7 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             if (CMP_SetComputeOptions(&options) != CMP_OK)
             {
                 CMP_DestroyComputeLibrary(true);
-                printf("Failed to setup SPMD GPU options\n");
+                PrintInfo("Failed to setup SPMD GPU options\n");
                 cmp_mutex.unlock();
                 return CMP_ERR_FAILED_HOST_SETUP;
             }
@@ -556,7 +556,7 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             {
                 CMips.FreeMipSet(dstMipSet);
                 CMP_DestroyComputeLibrary(true);
-                printf("Failed to run compute plugin: CPU will be used for compression.\n");
+                PrintInto("Failed to run compute plugin: CPU will be used for compression.\n");
                 cmp_mutex.unlock();
                 return CMP_ERR_FAILED_HOST_SETUP;
             }
@@ -565,7 +565,7 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             if (kernelOptions.getPerfStats)
             {
                 if (CMP_GetPerformanceStats(&kernelOptions.perfStats) != CMP_OK)
-                    printf("Warning unable to get compute plugin performance stats\n");
+                    PrintInfo("Warning unable to get compute plugin performance stats\n");
             }
 
             //===============================================================================
