@@ -556,7 +556,7 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             {
                 CMips.FreeMipSet(dstMipSet);
                 CMP_DestroyComputeLibrary(true);
-                PrintInto("Failed to run compute plugin: CPU will be used for compression.\n");
+                PrintInfo("Failed to run compute plugin: CPU will be used for compression.\n");
                 cmp_mutex.unlock();
                 return CMP_ERR_FAILED_HOST_SETUP;
             }
