@@ -389,8 +389,6 @@ CMP_ERROR CMP_API CMP_CompressTexture(KernelOptions* options, CMP_MipSet srcMipS
 {
     CMP_ERROR result;
 
-    printf("CMP_CompressTexture\n");
-
     if (g_ComputeBase)
     {
         result = g_ComputeBase->TC_Compress(options, srcMipSet, dstMipSet, pFeedback);
@@ -423,7 +421,6 @@ std::mutex cmp_mutex;
 
 CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSet, KernelOptions kernelOptions, CMP_Feedback_Proc pFeedbackProc)
 {
-    printf("init\n");
     cmp_mutex.lock();
 
     CMP_CMIPS CMips;
