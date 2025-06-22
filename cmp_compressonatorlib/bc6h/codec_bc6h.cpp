@@ -181,28 +181,31 @@ CCodec_BC6H::~CCodec_BC6H()
             m_EncodeParameterStorage[i].exit = TRUE;
     }
 
-
-    for (DWORD dwThread = 0; dwThread < m_LiveThreads; dwThread++)
+    if (m_EncodingThreadHandle != NULL)
     {
-        std::thread& curThread = m_EncodingThreadHandle[dwThread];
+        for (DWORD dwThread = 0; dwThread < m_LiveThreads; dwThread++)
+        {
+            std::thread& curThread = m_EncodingThreadHandle[dwThread];
+            curThread.join();
+        }
 
-        curThread.join();
+        for (unsigned int i = 0; i < m_LiveThreads; i++)
+        {
+            std::thread& curThread = m_EncodingThreadHandle[i];
+
+            curThread = std::thread();
+        }
+
+        // Clear storage of threads
+        delete[] m_EncodingThreadHandle;
+        m_EncodingThreadHandle = NULL;
     }
-
-    for (unsigned int i = 0; i < m_LiveThreads; i++)
-    {
-        std::thread& curThread = m_EncodingThreadHandle[i];
-
-        curThread = std::thread();
-    }
-
-    // Clear storage of threads
-    delete[] m_EncodingThreadHandle;
-    m_EncodingThreadHandle = NULL;
 
     if (m_EncodeParameterStorage)
+    {
         delete[] m_EncodeParameterStorage;
-    m_EncodeParameterStorage = NULL;
+        m_EncodeParameterStorage = NULL;
+    }
 
     // Delete encoders
     for (int i = 0; i < m_NumEncodingThreads; i++)
@@ -290,12 +293,14 @@ CodecError CCodec_BC6H::CInitializeBC6HLibrary()
                 delete[] m_EncodeParameterStorage;
             m_EncodeParameterStorage = NULL;
 
-            delete[] m_EncodingThreadHandle;
+            if (m_EncodingThreadHandle)
+                delete[] m_EncodingThreadHandle;
             m_EncodingThreadHandle = NULL;
 
             for (int j = 0; j < i; j++)
             {
-                delete m_encoder[j];
+                if (m_encoder[j])
+                    delete m_encoder[j];
                 m_encoder[j] = NULL;
             }
 
@@ -334,6 +339,8 @@ CodecError CCodec_BC6H::CInitializeBC6HLibrary()
     }
 
     m_LibraryInitialized = true;
+
+    return CE_OK;
 }
 
 CodecError CCodec_BC6H::CEncodeBC6HBlock(float in[MAX_SUBSET_SIZE][MAX_DIMENSION_BIG], BYTE* out)
@@ -391,9 +398,10 @@ CodecError CCodec_BC6H::CEncodeBC6HBlock(float in[MAX_SUBSET_SIZE][MAX_DIMENSION
 CodecError CCodec_BC6H::CFinishBC6HEncoding(void)
 {
     if (!m_LibraryInitialized)
-    {
         return CE_Unknown;
-    }
+    
+    if (!m_EncodeParameterStorage)
+        return CE_OK;
     
     // Wait for all the live threads to finish any current work
     for (DWORD i = 0; i < m_LiveThreads; i++)
