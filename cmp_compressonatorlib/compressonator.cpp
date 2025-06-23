@@ -294,6 +294,8 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
 #endif
 
     printf("Check destination\n");
+    printf("Size of Format: %d", sizeof(CMP_FORMAT));
+    printf("Size of Compression Options: %d", sizeof(CMP_CompressOptions));
     tc_err = CheckTexture(pDestTexture, false);
     if (tc_err != CMP_OK)
         return tc_err;
