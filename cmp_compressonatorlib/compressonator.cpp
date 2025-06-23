@@ -612,10 +612,9 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 
         p_MipSetOut->m_nMipLevels = p_MipSetIn->m_nMipLevels;
 
-        printf("Faces\n");
-
         for (int nMipLevel = 0; nMipLevel < srcNumMipmapLevels; nMipLevel++)
         {
+            printf("Mips %d / %d \n", nMipLevel, srcNumMipmapLevels);
             if (pOptions->m_PrintInfoStr && srcNumMipmapLevels > 1)
             {
                 char buff[256];
@@ -625,6 +624,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 
             for (int nFaceOrSlice = 0; nFaceOrSlice < CMP_MaxFacesOrSlices(p_MipSetIn, nMipLevel); nFaceOrSlice++)
             {
+                printf("Face %d\n", nFaceOrSlice);
                 CMP_DWORD sourceDataSize = 0;
 
                 //=====================
@@ -640,13 +640,18 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 srcTexture.dwWidth         = srcMipLevel->m_nWidth;
                 srcTexture.dwHeight        = srcMipLevel->m_nHeight;
                 srcTexture.pData           = srcMipLevel->m_pbData;
+                printf("Buffers source\n");
                 srcTexture.dwDataSize      = CMP_CalculateBufferSize(&srcTexture);
+
+                printf("Uncompressed source done\n");
 
                 // Temporary settings
                 p_MipSetIn->dwWidth    = srcTexture.dwWidth;
                 p_MipSetIn->dwHeight   = srcTexture.dwHeight;
                 p_MipSetIn->pData      = srcTexture.pData;
                 p_MipSetIn->dwDataSize = srcTexture.dwDataSize;
+
+                printf("Temporary setings\n");
 
                 //========================
                 // Compressed Destination
@@ -660,12 +665,14 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 destTexture.nBlockHeight    = p_MipSetOut->m_nBlockHeight;
                 destTexture.format          = pOptions->DestFormat;
                 destTexture.transcodeFormat = p_MipSetOut->m_transcodeFormat;
+                printf("Buffers destination\n");
                 destTexture.dwDataSize      = CMP_CalculateBufferSize(&destTexture);
 
                 p_MipSetOut->m_format   = destTexture.format;
                 p_MipSetOut->dwDataSize = destTexture.dwDataSize;
                 p_MipSetOut->dwWidth    = destTexture.dwWidth;
                 p_MipSetOut->dwHeight   = destTexture.dwHeight;
+                printf("Compressed destination\n");
 
                 printf("faces allocate compressedmipleveldata\n");
                 //--------------------------------------
