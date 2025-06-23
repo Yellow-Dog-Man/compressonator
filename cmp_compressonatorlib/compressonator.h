@@ -77,7 +77,7 @@ typedef double               CMP_DOUBLE;
 
 // Texture format.
 
-typedef enum
+typedef enum : uint16_t
 {
     CMP_FORMAT_Unknown = 0x0000,  // Undefined texture format.
 
