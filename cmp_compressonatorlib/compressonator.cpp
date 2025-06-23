@@ -587,7 +587,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     else
 #endif
     {
-        printf("Allocate Mipset");
+        printf("Allocate Mipset\n");
         if (!CMips.AllocateMipSet(p_MipSetOut,
                                   p_MipSetOut->m_ChannelFormat,
                                   TDT_ARGB,
@@ -617,10 +617,14 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
             printf("Mips %d / %d \n", nMipLevel, srcNumMipmapLevels);
             if (pOptions->m_PrintInfoStr && srcNumMipmapLevels > 1)
             {
+                printf("A\n");
                 char buff[256];
+                printf("B\n");
                 snprintf(buff, sizeof(buff), "Processing miplevel %d for texture...\n", nMipLevel);
+                printf("C\n");
                 pOptions->m_PrintInfoStr(buff);
             }
+            printf("Done with Print Stuff on to max Faces\n");
 
             for (int nFaceOrSlice = 0; nFaceOrSlice < CMP_MaxFacesOrSlices(p_MipSetIn, nMipLevel); nFaceOrSlice++)
             {
