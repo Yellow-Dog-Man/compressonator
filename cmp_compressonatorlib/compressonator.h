@@ -382,7 +382,7 @@ typedef void(CMP_API* CMP_PrintInfoStr)(const char* InfoStr);
 
 // Pack CMP_CompressOptions to match Compressonator.NET
 #pragma pack(push)
-#pragma pack(4)
+#pragma pack(1)
 // User options and setting used for processing
 typedef struct
 {
