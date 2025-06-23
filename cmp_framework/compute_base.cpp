@@ -434,6 +434,7 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
     dstMipSet->m_format  = kernelOptions.format;
     dstMipSet->m_nHeight = srcMipSet->m_nHeight;
     dstMipSet->m_nWidth  = srcMipSet->m_nWidth;
+
     CMP_Format2FourCC(dstMipSet->m_format, dstMipSet);
 
     //=====================================================
@@ -494,8 +495,9 @@ CMP_ERROR CMP_API CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSe
             destTexture.dwWidth      = pInMipLevel->m_nWidth;
             destTexture.dwHeight     = pInMipLevel->m_nHeight;
             destTexture.dwPitch      = 0;
-            destTexture.nBlockWidth  = srcMipSet->m_nBlockWidth;
-            destTexture.nBlockHeight = srcMipSet->m_nBlockHeight;
+            destTexture.nBlockWidth  = dstMipSet->m_nBlockWidth;
+            destTexture.nBlockHeight = dstMipSet->m_nBlockHeight;
+            destTexture.nBlockDepth  = dstMipSet->m_nBlockDepth;
             destTexture.format       = dstMipSet->m_format;
             destTexture.dwDataSize   = CMP_CalculateBufferSize(&destTexture);
 

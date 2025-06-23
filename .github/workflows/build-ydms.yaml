@@ -38,6 +38,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
+          if-no-files-found: error
           name: ${{ env.distname }}
           path: ${{ env.wps }}/lib/**/*.so
 
@@ -59,9 +60,10 @@ jobs:
         shell: bash
         run: |
           mkdir results
-          cp build/Release*/x64/{*.lib,*.dll} results
+          cp -r build/Release*/x64/** results
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
+          if-no-files-found: error
           name: windows-lib
           path: results/

@@ -83,7 +83,6 @@ private:
 
     // BC6H User configurable variables
     CMP_WORD m_ModeMask;
-    float    m_Quality;
     CMP_WORD m_NumThreads;
     bool     m_bIsSigned;
     bool     m_UsePatternRec;

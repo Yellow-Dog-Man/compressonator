@@ -838,7 +838,7 @@ typedef struct
     CMP_WORD dwMask;          // User can enable or disable specific modes default is 0xFFFF
     float    fExposure;       // Sets the image lighter (using larger values) or darker (using lower values) default is 0.95
     bool     bIsSigned;       // Specify if half floats are signed or unsigned BC6H_UF16 or BC6H_SF16
-    float    fQuality;        // Reserved: not used in BC6H at this time
+    float    fQuality;        // Quality of encoding. This value ranges between 0.0 and 1.0.
     bool     bUsePatternRec;  // Reserved: for new algorithm to use mono pattern shape matching based on two pixel planes
 } CMP_BC6H_BLOCK_PARAMETERS;
 
@@ -850,7 +850,7 @@ typedef struct
 //
 // Arguments and Settings:
 //
-//      quality       - Quality of encoding. This value ranges between 0.0 and 1.0. (Valid only for BC7 in this release) default is 0.01
+//      quality       - Quality of encoding. This value ranges between 0.0 and 1.0. default is 0.05f  
 //                      0.0 gives the fastest, lowest quality encoding, 1.0 is the slowest, highest quality encoding
 //                      In general even quality level 0.0 will give very good results on the vast majority of images
 //                      Higher quality settings may be needed for some difficult images (e.g. normal maps) to give good results
@@ -858,7 +858,7 @@ typedef struct
 //                      give very close to the highest possible quality, increasing the level above this will cause large
 //                      increases in encoding time for very marginal gains in quality
 //
-//      performance   - Perfromance of encoding. This value ranges between 0.0 and 1.0. (Valid only for BC7 in this release) Typical default is 1.0
+//      performance   - Performance of encoding. This value ranges between 0.0 and 1.0. (Valid only for BC7 in this release) Typical default is 1.0
 //                      Encoding time can be reduced by incresing this value for a given Quality level. Lower values will improve overall quality with
 //                        optimal setting been performed at a value of 0.
 //
