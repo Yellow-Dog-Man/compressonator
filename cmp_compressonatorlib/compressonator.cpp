@@ -488,7 +488,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     // Setup Compressed Mip Set Target
     // --------------------------------
     //if (GetCodecType(pOptions->DestFormat) == CT_Unknown) return CMP_ERR_UNKNOWN_DESTINATION_FORMAT;
-
+    printf("Test 1\n");
     // -------------
     // Output
     // -------------
@@ -498,12 +498,13 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     p_MipSetOut->m_nHeight = p_MipSetIn->m_nHeight;
     p_MipSetOut->m_nWidth  = p_MipSetIn->m_nWidth;
     CMP_Format2FourCC(pOptions->DestFormat, p_MipSetOut);
-
+    printf("Test 2\n");
     // Default compression block size if not set!
     p_MipSetIn->m_nBlockWidth  = (p_MipSetIn->m_nBlockWidth == 0) ? 4 : p_MipSetIn->m_nBlockWidth;
     p_MipSetIn->m_nBlockHeight = (p_MipSetIn->m_nBlockHeight == 0) ? 4 : p_MipSetIn->m_nBlockHeight;
     p_MipSetIn->m_nDepth       = (p_MipSetIn->m_nDepth < 1) ? 1 : p_MipSetIn->m_nDepth;
 
+    printf("Test 3\n");
     // Allocate compression data
     p_MipSetOut->m_nMipLevels    = 1;  // this is overwritten depending on input.
     p_MipSetOut->m_ChannelFormat = CF_Compressed;
@@ -513,11 +514,13 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     p_MipSetOut->m_nDepth        = p_MipSetIn->m_nDepth;
     p_MipSetOut->m_TextureType   = p_MipSetIn->m_TextureType;
 
+    printf("Test 4\n");
     if (pOptions->DestFormat == CMP_FORMAT_BROTLIG)
         p_MipSetOut->m_transcodeFormat = p_MipSetIn->m_format;
 
     p_MipSetOut->m_nIterations = 0;  // tracks number of processed data miplevels
 
+    printf("Test 5\n");
     //=====================================================
     // Case Uncompressed Source to Compressed Destination
     //=====================================================
@@ -593,6 +596,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     else
 #endif
     {
+        printf("Test 6\n");
         if (!CMips.AllocateMipSet(p_MipSetOut,
                                   p_MipSetOut->m_ChannelFormat,
                                   TDT_ARGB,
@@ -614,11 +618,13 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
         {
             srcNumMipmapLevels = 1;
         }
+        printf("Test 7\n");
 
         p_MipSetOut->m_nMipLevels = p_MipSetIn->m_nMipLevels;
 
         for (int nMipLevel = 0; nMipLevel < srcNumMipmapLevels; nMipLevel++)
         {
+            printf("Test 8 %d / %d\n", nMipLevel, srcNumMipmapLevels);
 
 #ifndef _LINUX
             if (pOptions->m_PrintInfoStr && srcNumMipmapLevels > 1)
@@ -631,6 +637,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 
             for (int nFaceOrSlice = 0; nFaceOrSlice < CMP_MaxFacesOrSlices(p_MipSetIn, nMipLevel); nFaceOrSlice++)
             {
+                printf("Test 9 Face: %d \n", nFaceOrSlice);
                 CMP_DWORD sourceDataSize = 0;
 
                 //=====================
@@ -649,11 +656,15 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 
                 srcTexture.dwDataSize      = CMP_CalculateBufferSize(&srcTexture);
 
+                printf("Test 10\n");
+
                 // Temporary settings
                 p_MipSetIn->dwWidth    = srcTexture.dwWidth;
                 p_MipSetIn->dwHeight   = srcTexture.dwHeight;
                 p_MipSetIn->pData      = srcTexture.pData;
                 p_MipSetIn->dwDataSize = srcTexture.dwDataSize;
+
+                printf("Test 11\n");
 
                 //========================
                 // Compressed Destination
@@ -669,12 +680,16 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 destTexture.format          = pOptions->DestFormat;
                 destTexture.transcodeFormat = p_MipSetOut->m_transcodeFormat;
 
+                printf("Test 12\n");
+
                 destTexture.dwDataSize      = CMP_CalculateBufferSize(&destTexture);
 
                 p_MipSetOut->m_format   = destTexture.format;
                 p_MipSetOut->dwDataSize = destTexture.dwDataSize;
                 p_MipSetOut->dwWidth    = destTexture.dwWidth;
                 p_MipSetOut->dwHeight   = destTexture.dwHeight;
+
+                printf("Test 13\n");
 
                 //--------------------------------------
                 // Allocate MipSet for Block Compressors
@@ -684,6 +699,8 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 {
                     return CMP_ERR_MEM_ALLOC_FOR_MIPSET;
                 }
+
+                printf("Test 14\n");
 
                 destTexture.pData  = pOutMipLevel->m_pbData;
                 p_MipSetOut->pData = pOutMipLevel->m_pbData;
@@ -711,7 +728,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 // this is needed to preserve the correct initial source size because CMP_ConvertTexture might
                 // edit the srcTexture and change its format into one better suited for processing
                 sourceDataSize = srcTexture.dwDataSize;
-
+                printf("Test 15\n");
                 //========================
                 // Process ConvertTexture
                 //========================
@@ -730,6 +747,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                     p_MipSetOut->dwDataSize = destTexture.dwDataSize;
                 }
 #ifndef _LINUX
+                printf("Test 18\n");
                 //==========================
                 // Print info about output
                 //==========================
@@ -745,6 +763,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                     pOptions->m_PrintInfoStr(buff);
                 }
 #endif
+printf("Test 19\n");
             }
         }
     }
