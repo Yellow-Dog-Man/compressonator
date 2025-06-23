@@ -1065,6 +1065,7 @@ CMP_ERROR CMP_API  CMP_GetPerformanceStats(KernelPerformanceStats* pPerfStats);
 CMP_ERROR CMP_API  CMP_GetDeviceInfo(KernelDeviceInfo* pDeviceInfo);
 CMP_BOOL CMP_API   CMP_IsCompressedFormat(CMP_FORMAT format);
 CMP_BOOL CMP_API   CMP_IsFloatFormat(CMP_FORMAT InFormat);
+CMP_BOOL CMP_API   CMP_IsValidFormat(CMP_FORMAT InFormat);
 
 //--------------------------------------------
 // CMP_Framework Lib: Host level interface
