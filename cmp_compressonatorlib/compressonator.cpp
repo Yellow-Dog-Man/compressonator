@@ -620,6 +620,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 snprintf(buff, sizeof(buff), "Processing miplevel %d for texture...\n", nMipLevel);
                 pOptions->m_PrintInfoStr(buff);
             }
+#endif
 
             for (int nFaceOrSlice = 0; nFaceOrSlice < CMP_MaxFacesOrSlices(p_MipSetIn, nMipLevel); nFaceOrSlice++)
             {
