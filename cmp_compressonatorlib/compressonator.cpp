@@ -587,7 +587,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     else
 #endif
     {
-        printf("Allocate Mipset\n");
         if (!CMips.AllocateMipSet(p_MipSetOut,
                                   p_MipSetOut->m_ChannelFormat,
                                   TDT_ARGB,
@@ -614,21 +613,18 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 
         for (int nMipLevel = 0; nMipLevel < srcNumMipmapLevels; nMipLevel++)
         {
-            printf("Mips %d / %d \n", nMipLevel, srcNumMipmapLevels);
+
+#ifndef _LINUX
             if (pOptions->m_PrintInfoStr && srcNumMipmapLevels > 1)
             {
-                printf("A\n");
                 char buff[256];
-                printf("B\n");
                 snprintf(buff, sizeof(buff), "Processing miplevel %d for texture...\n", nMipLevel);
-                printf("C\n");
                 pOptions->m_PrintInfoStr(buff);
             }
-            printf("Done with Print Stuff on to max Faces\n");
+#endif
 
             for (int nFaceOrSlice = 0; nFaceOrSlice < CMP_MaxFacesOrSlices(p_MipSetIn, nMipLevel); nFaceOrSlice++)
             {
-                printf("Face %d\n", nFaceOrSlice);
                 CMP_DWORD sourceDataSize = 0;
 
                 //=====================
@@ -644,18 +640,14 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 srcTexture.dwWidth         = srcMipLevel->m_nWidth;
                 srcTexture.dwHeight        = srcMipLevel->m_nHeight;
                 srcTexture.pData           = srcMipLevel->m_pbData;
-                printf("Buffers source\n");
-                srcTexture.dwDataSize      = CMP_CalculateBufferSize(&srcTexture);
 
-                printf("Uncompressed source done\n");
+                srcTexture.dwDataSize      = CMP_CalculateBufferSize(&srcTexture);
 
                 // Temporary settings
                 p_MipSetIn->dwWidth    = srcTexture.dwWidth;
                 p_MipSetIn->dwHeight   = srcTexture.dwHeight;
                 p_MipSetIn->pData      = srcTexture.pData;
                 p_MipSetIn->dwDataSize = srcTexture.dwDataSize;
-
-                printf("Temporary setings\n");
 
                 //========================
                 // Compressed Destination
@@ -669,16 +661,14 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 destTexture.nBlockHeight    = p_MipSetOut->m_nBlockHeight;
                 destTexture.format          = pOptions->DestFormat;
                 destTexture.transcodeFormat = p_MipSetOut->m_transcodeFormat;
-                printf("Buffers destination\n");
+
                 destTexture.dwDataSize      = CMP_CalculateBufferSize(&destTexture);
 
                 p_MipSetOut->m_format   = destTexture.format;
                 p_MipSetOut->dwDataSize = destTexture.dwDataSize;
                 p_MipSetOut->dwWidth    = destTexture.dwWidth;
                 p_MipSetOut->dwHeight   = destTexture.dwHeight;
-                printf("Compressed destination\n");
 
-                printf("faces allocate compressedmipleveldata\n");
                 //--------------------------------------
                 // Allocate MipSet for Block Compressors
                 //--------------------------------------
@@ -691,6 +681,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 destTexture.pData  = pOutMipLevel->m_pbData;
                 p_MipSetOut->pData = pOutMipLevel->m_pbData;
 
+#ifndef _LINUX
                 //==========================
                 // Print info about input
                 //==========================
@@ -709,9 +700,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                                  srcTexture.dwHeight);
                     pOptions->m_PrintInfoStr(buff);
                 }
-
-                printf("Just before CMP_converrttexture\n");
-
+#endif
                 // this is needed to preserve the correct initial source size because CMP_ConvertTexture might
                 // edit the srcTexture and change its format into one better suited for processing
                 sourceDataSize = srcTexture.dwDataSize;
@@ -722,8 +711,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 // Process ConvertTexture
                 //========================
                 CMP_ERROR cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, pOptions, pFeedbackProc);
-
-                printf("after CMP_ConvertTexture\n");
 
                 if (cmp_status != CMP_OK)
                 {
@@ -736,7 +723,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 {
                     p_MipSetOut->dwDataSize = destTexture.dwDataSize;
                 }
-
+#ifndef _LINUX
                 //==========================
                 // Print info about output
                 //==========================
@@ -751,6 +738,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                              sourceDataSize / (float)destTexture.dwDataSize);
                     pOptions->m_PrintInfoStr(buff);
                 }
+#endif
             }
         }
     }
