@@ -158,7 +158,7 @@ CMP_ERROR CheckTexture(const CMP_Texture* pTexture, bool bSource)
     if (pTexture->dwHeight <= 0)
         return (bSource ? CMP_ERR_INVALID_SOURCE_TEXTURE : CMP_ERR_INVALID_DEST_TEXTURE);
 
-    printf("check texture F\n");
+    printf("check texture F: %d \n", pTexture->format);
     if (!CMP_IsValidFormat(pTexture->format))
         return (bSource ? CMP_ERR_UNSUPPORTED_SOURCE_FORMAT : CMP_ERR_UNSUPPORTED_DEST_FORMAT);
 

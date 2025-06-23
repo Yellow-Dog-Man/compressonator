@@ -498,6 +498,9 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     p_MipSetOut->m_Flags   = MS_FLAG_Default;
     printf("Test C\n");
     p_MipSetOut->m_format  = pOptions->DestFormat;
+
+    printf("Set format to: %d", pOptions->DestFormat);
+
     printf("Test D\n");
     p_MipSetOut->m_nHeight = p_MipSetIn->m_nHeight;
     printf("Test E\n");
@@ -632,14 +635,15 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
         {
             printf("Test 8 %d / %d\n", nMipLevel, srcNumMipmapLevels);
 
-#ifndef _LINUX
-            if (pOptions->m_PrintInfoStr && srcNumMipmapLevels > 1)
-            {
-                char buff[256];
-                snprintf(buff, sizeof(buff), "Processing miplevel %d for texture...\n", nMipLevel);
-                pOptions->m_PrintInfoStr(buff);
-            }
-#endif
+// Disabled, not working in Compressonator.NET
+// #ifndef _LINUX
+//             if (pOptions->m_PrintInfoStr && srcNumMipmapLevels > 1)
+//             {
+//                 char buff[256];
+//                 snprintf(buff, sizeof(buff), "Processing miplevel %d for texture...\n", nMipLevel);
+//                 pOptions->m_PrintInfoStr(buff);
+//             }
+// #endif
 
             for (int nFaceOrSlice = 0; nFaceOrSlice < CMP_MaxFacesOrSlices(p_MipSetIn, nMipLevel); nFaceOrSlice++)
             {
@@ -684,6 +688,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 destTexture.nBlockWidth     = p_MipSetOut->m_nBlockWidth;
                 destTexture.nBlockHeight    = p_MipSetOut->m_nBlockHeight;
                 destTexture.format          = pOptions->DestFormat;
+                printf("Set destTexture format to: %d", pOptions->DestFormat);
                 destTexture.transcodeFormat = p_MipSetOut->m_transcodeFormat;
 
                 printf("Test 12\n");
@@ -711,29 +716,31 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 destTexture.pData  = pOutMipLevel->m_pbData;
                 p_MipSetOut->pData = pOutMipLevel->m_pbData;
 
-#ifndef _LINUX
-                //==========================
-                // Print info about input
-                //==========================
-                // NOTE: This is duplicated in CMP_ConvertMipTextureCGP
-                if (pOptions->m_PrintInfoStr)
-                {
-                    char buff[256];
-                    if ((p_MipSetOut->m_format == CMP_FORMAT_BROTLIG) || (p_MipSetOut->m_format == CMP_FORMAT_BINARY))
-                        snprintf(buff, sizeof(buff), "Source data size      = %d Bytes\n", srcTexture.dwDataSize);
-                    else
-                        snprintf(buff,
-                                 sizeof(buff),
-                                 "Source data size      = %d Bytes, width = %d px  height = %d px\n",
-                                 srcTexture.dwDataSize,
-                                 srcTexture.dwWidth,
-                                 srcTexture.dwHeight);
-                    pOptions->m_PrintInfoStr(buff);
-                }
-#endif
+// Disabled, not working in Compressonator.NET
+// #ifndef _LINUX
+//                 //==========================
+//                 // Print info about input
+//                 //==========================
+//                 // NOTE: This is duplicated in CMP_ConvertMipTextureCGP
+//                 if (pOptions->m_PrintInfoStr)
+//                 {
+//                     char buff[256];
+//                     if ((p_MipSetOut->m_format == CMP_FORMAT_BROTLIG) || (p_MipSetOut->m_format == CMP_FORMAT_BINARY))
+//                         snprintf(buff, sizeof(buff), "Source data size      = %d Bytes\n", srcTexture.dwDataSize);
+//                     else
+//                         snprintf(buff,
+//                                  sizeof(buff),
+//                                  "Source data size      = %d Bytes, width = %d px  height = %d px\n",
+//                                  srcTexture.dwDataSize,
+//                                  srcTexture.dwWidth,
+//                                  srcTexture.dwHeight);
+//                     pOptions->m_PrintInfoStr(buff);
+//                 }
+// #endif
                 // this is needed to preserve the correct initial source size because CMP_ConvertTexture might
                 // edit the srcTexture and change its format into one better suited for processing
                 sourceDataSize = srcTexture.dwDataSize;
+                printf("format to: %d", pOptions->DestFormat);
                 printf("Test 15\n");
                 //========================
                 // Process ConvertTexture
@@ -752,23 +759,24 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 {
                     p_MipSetOut->dwDataSize = destTexture.dwDataSize;
                 }
-#ifndef _LINUX
-                printf("Test 18\n");
-                //==========================
-                // Print info about output
-                //==========================
-                // NOTE: This is mostly duplicated in CMP_ConvertMipTextureCGP
-                if (pOptions->m_PrintInfoStr && (destTexture.dwDataSize > 0) && (p_MipSetOut->m_format != CMP_FORMAT_BINARY))
-                {
-                    char buff[256];
-                    snprintf(buff,
-                             sizeof(buff),
-                             "\rDestination data size = %d Bytes   Resulting compression ratio = %2.2f:1\n",
-                             destTexture.dwDataSize,
-                             sourceDataSize / (float)destTexture.dwDataSize);
-                    pOptions->m_PrintInfoStr(buff);
-                }
-#endif
+// // Disabled, not working in Compressonator.NET
+// #ifndef _LINUX
+//                 printf("Test 18\n");
+//                 //==========================
+//                 // Print info about output
+//                 //==========================
+//                 // NOTE: This is mostly duplicated in CMP_ConvertMipTextureCGP
+//                 if (pOptions->m_PrintInfoStr && (destTexture.dwDataSize > 0) && (p_MipSetOut->m_format != CMP_FORMAT_BINARY))
+//                 {
+//                     char buff[256];
+//                     snprintf(buff,
+//                              sizeof(buff),
+//                              "\rDestination data size = %d Bytes   Resulting compression ratio = %2.2f:1\n",
+//                              destTexture.dwDataSize,
+//                              sourceDataSize / (float)destTexture.dwDataSize);
+//                     pOptions->m_PrintInfoStr(buff);
+//                 }
+// #endif
 printf("Test 19\n");
             }
         }
