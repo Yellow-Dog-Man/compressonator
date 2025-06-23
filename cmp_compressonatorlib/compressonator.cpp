@@ -492,11 +492,17 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     // -------------
     // Output
     // -------------
+    printf("Test A\n");
     memset(p_MipSetOut, 0, sizeof(CMP_MipSet));
+    printf("Test B\n");
     p_MipSetOut->m_Flags   = MS_FLAG_Default;
+    printf("Test C\n");
     p_MipSetOut->m_format  = pOptions->DestFormat;
+    printf("Test D\n");
     p_MipSetOut->m_nHeight = p_MipSetIn->m_nHeight;
+    printf("Test E\n");
     p_MipSetOut->m_nWidth  = p_MipSetIn->m_nWidth;
+    printf("Test F\n");
     CMP_Format2FourCC(pOptions->DestFormat, p_MipSetOut);
     printf("Test 2\n");
     // Default compression block size if not set!
