@@ -138,38 +138,49 @@ CMP_DWORD CMP_API CMP_CalculateBufferSize(const CMP_Texture* texture)
 
 CMP_ERROR CheckTexture(const CMP_Texture* pTexture, bool bSource)
 {
+    printf("check texture A\n");
     if (pTexture == NULL)
         return (bSource ? CMP_ERR_INVALID_SOURCE_TEXTURE : CMP_ERR_INVALID_DEST_TEXTURE);
 
+    printf("check texture B\n");
     if (pTexture->pData == NULL)
         return (bSource ? CMP_ERR_INVALID_SOURCE_TEXTURE : CMP_ERR_INVALID_DEST_TEXTURE);
 
+    printf("check texture C\n");
     if (pTexture->dwSize != sizeof(CMP_Texture))
         return (bSource ? CMP_ERR_INVALID_SOURCE_TEXTURE : CMP_ERR_INVALID_DEST_TEXTURE);
 
+    printf("check texture D\n");
     if (pTexture->dwWidth <= 0)
         return (bSource ? CMP_ERR_INVALID_SOURCE_TEXTURE : CMP_ERR_INVALID_DEST_TEXTURE);
 
+    printf("check texture E\n");
     if (pTexture->dwHeight <= 0)
         return (bSource ? CMP_ERR_INVALID_SOURCE_TEXTURE : CMP_ERR_INVALID_DEST_TEXTURE);
 
+    printf("check texture F\n");
     if (!CMP_IsValidFormat(pTexture->format))
         return (bSource ? CMP_ERR_UNSUPPORTED_SOURCE_FORMAT : CMP_ERR_UNSUPPORTED_DEST_FORMAT);
 
+    printf("check texture G\n");
     assert((pTexture->format != CMP_FORMAT_ARGB_8888 && pTexture->format != CMP_FORMAT_ARGB_2101010) || pTexture->dwPitch == 0 ||
            pTexture->dwPitch >= (pTexture->dwWidth * 4));
 
+    printf("check texture H\n");
     assert((pTexture->format != CMP_FORMAT_RGBA_8888_S && pTexture->format != CMP_FORMAT_ARGB_2101010) || pTexture->dwPitch == 0 ||
            pTexture->dwPitch >= (pTexture->dwWidth * 4));
 
+    printf("check texture I\n");
     if ((pTexture->format == CMP_FORMAT_ARGB_8888 || pTexture->format == CMP_FORMAT_ARGB_2101010) && pTexture->dwPitch != 0 &&
         pTexture->dwPitch < (pTexture->dwWidth * 4))
         return (bSource ? CMP_ERR_UNSUPPORTED_SOURCE_FORMAT : CMP_ERR_UNSUPPORTED_DEST_FORMAT);
 
+    printf("check texture J\n");
     if ((pTexture->format == CMP_FORMAT_RGBA_8888_S || pTexture->format == CMP_FORMAT_ARGB_2101010) && pTexture->dwPitch != 0 &&
         pTexture->dwPitch < (pTexture->dwWidth * 4))
         return (bSource ? CMP_ERR_UNSUPPORTED_SOURCE_FORMAT : CMP_ERR_UNSUPPORTED_DEST_FORMAT);
 
+    printf("check texture K\n");
     CMP_DWORD dwDataSize = CMP_CalculateBufferSize(pTexture);
     if (pTexture->dwDataSize < dwDataSize)
         return (bSource ? CMP_ERR_INVALID_SOURCE_TEXTURE : CMP_ERR_INVALID_DEST_TEXTURE);

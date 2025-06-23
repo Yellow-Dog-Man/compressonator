@@ -293,6 +293,7 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
     srcTextureCopy.dwDataSize        = compatibleBuffer.dataSize;
 #endif
 
+    printf("Check destination\n");
     tc_err = CheckTexture(pDestTexture, false);
     if (tc_err != CMP_OK)
         return tc_err;
@@ -300,17 +301,21 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
     if (srcTextureCopy.dwWidth != pDestTexture->dwWidth || srcTextureCopy.dwHeight != pDestTexture->dwHeight)
         return CMP_ERR_SIZE_MISMATCH;
 
+    printf("Check codec src\n");
     CodecType srcType = GetCodecType(srcTextureCopy.format);
     assert(srcType != CT_Unknown);
     if (srcType == CT_Unknown)
         return CMP_ERR_UNSUPPORTED_SOURCE_FORMAT;
 
+    printf("Check codec destination\n");
     CodecType destType = GetCodecType(pDestTexture->format);
     assert(destType != CT_Unknown);
     if (destType == CT_Unknown)
         return CMP_ERR_UNSUPPORTED_DEST_FORMAT;
 
     // Figure out the type of processing we are doing
+
+    printf("Pre-flight done\n");
 
     bool compressing   = srcType == CT_None && destType != CT_None;
     bool decompressing = srcType != CT_None && destType == CT_None;
@@ -397,11 +402,13 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
 #endif
         )
         {
+            printf("CodecCompress Threaded\n");
             return CodecCompressTextureThreaded(&srcTextureCopy, pDestTexture, pOptions, pFeedbackProc);
         }
         else
 #endif  // THREADED_COMPRESS
         {
+            printf("CodecCompress Non-Threaded\n");
             return CodecCompressTexture(&srcTextureCopy, pDestTexture, pOptions, pFeedbackProc);
         }
     }
@@ -653,11 +660,12 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 //========================
                 CMP_Texture destTexture     = {};
                 destTexture.dwSize          = sizeof(destTexture);
+
                 destTexture.dwWidth         = srcMipLevel->m_nWidth;
                 destTexture.dwHeight        = srcMipLevel->m_nHeight;
                 destTexture.dwPitch         = 0;
-                destTexture.nBlockWidth     = p_MipSetIn->m_nBlockWidth;
-                destTexture.nBlockHeight    = p_MipSetIn->m_nBlockHeight;
+                destTexture.nBlockWidth     = p_MipSetOut->m_nBlockWidth;
+                destTexture.nBlockHeight    = p_MipSetOut->m_nBlockHeight;
                 destTexture.format          = pOptions->DestFormat;
                 destTexture.transcodeFormat = p_MipSetOut->m_transcodeFormat;
 
@@ -709,6 +717,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 //========================
                 CMP_ERROR cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, pOptions, pFeedbackProc);
 
+                // Here
                 if (cmp_status != CMP_OK)
                 {
                     return cmp_status;
