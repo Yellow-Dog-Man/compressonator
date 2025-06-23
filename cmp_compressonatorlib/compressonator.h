@@ -380,6 +380,9 @@ typedef enum
 // function for printing std out info to users.
 typedef void(CMP_API* CMP_PrintInfoStr)(const char* InfoStr);
 
+// Pack CMP_CompressOptions to match Compressonator.NET
+#pragma pack(push)
+#pragma pack(4)
 // User options and setting used for processing
 typedef struct
 {
@@ -492,6 +495,8 @@ typedef struct
     CMP_BOOL useSRGBFrames;  // when using GPU HW for encoding and mipmap generation use SRGB frames, default is RGB
     CMP_INT  miplevels;      // miplevels to use when GPU is used to generate them
 } CMP_CompressOptions;
+
+#pragma pack(pop)
 
 //===================================
 // Definitions for CMP MipSet
