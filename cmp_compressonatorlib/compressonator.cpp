@@ -710,7 +710,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 //========================
                 CMP_ERROR cmp_status = CMP_ConvertTexture(&srcTexture, &destTexture, pOptions, pFeedbackProc);
 
-                // Here
                 if (cmp_status != CMP_OK)
                 {
                     return cmp_status;
