@@ -77,7 +77,7 @@ typedef double               CMP_DOUBLE;
 
 // Texture format.
 
-typedef enum
+typedef enum : CMP_UINT
 {
     CMP_FORMAT_Unknown = 0x0000,  // Undefined texture format.
 
@@ -380,6 +380,9 @@ typedef enum
 // function for printing std out info to users.
 typedef void(CMP_API* CMP_PrintInfoStr)(const char* InfoStr);
 
+// Pack CMP_CompressOptions to match Compressonator.NET
+#pragma pack(push)
+#pragma pack(1)
 // User options and setting used for processing
 typedef struct
 {
@@ -464,7 +467,6 @@ typedef struct
     CMP_INT iNormalBits;   // quantization bits for normal - default 10
     CMP_INT iGenericBits;  // quantization bits for generic - default 8
 
-#ifdef USE_3DMESH_OPTIMIZE
     CMP_INT iVcacheSize;      // For mesh vertices optimization, hardware vertex cache size. (value range 1 - no limit as it
                               // allows users to simulate hardware cache size to find the most optimum size)- default is enabled with cache size = 16
     CMP_INT iVcacheFIFOSize;  // For mesh vertices optimization, hardware vertex cache size. (value range 1 - no limit as it
@@ -474,7 +476,6 @@ typedef struct
     CMP_INT iSimplifyLOD;     // simplify mesh using LOD (Level of Details) value specified.(value range 1- no limit as it allows users
                               // to simplify the mesh until the level they desired. Higher level means less triangles drawn, less details.)
     bool bVertexFetch;        // optimize vertices fetch . boolean value 0 - disabled, 1-enabled. -default is enabled.
-#endif
 
     CMP_FORMAT SourceFormat;
     CMP_FORMAT DestFormat;
@@ -492,6 +493,8 @@ typedef struct
     CMP_BOOL useSRGBFrames;  // when using GPU HW for encoding and mipmap generation use SRGB frames, default is RGB
     CMP_INT  miplevels;      // miplevels to use when GPU is used to generate them
 } CMP_CompressOptions;
+
+#pragma pack(pop)
 
 //===================================
 // Definitions for CMP MipSet
@@ -1065,6 +1068,7 @@ CMP_ERROR CMP_API  CMP_GetPerformanceStats(KernelPerformanceStats* pPerfStats);
 CMP_ERROR CMP_API  CMP_GetDeviceInfo(KernelDeviceInfo* pDeviceInfo);
 CMP_BOOL CMP_API   CMP_IsCompressedFormat(CMP_FORMAT format);
 CMP_BOOL CMP_API   CMP_IsFloatFormat(CMP_FORMAT InFormat);
+CMP_BOOL CMP_API   CMP_IsValidFormat(CMP_FORMAT InFormat);
 
 //--------------------------------------------
 // CMP_Framework Lib: Host level interface
