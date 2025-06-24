@@ -293,9 +293,6 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
     srcTextureCopy.dwDataSize        = compatibleBuffer.dataSize;
 #endif
 
-    printf("Check destination\n");
-    printf("Size of Format: %d\n", sizeof(CMP_FORMAT));
-    printf("Size of Compression Options: %d\n", sizeof(CMP_CompressOptions));
     tc_err = CheckTexture(pDestTexture, false);
     if (tc_err != CMP_OK)
         return tc_err;
@@ -303,22 +300,17 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
     if (srcTextureCopy.dwWidth != pDestTexture->dwWidth || srcTextureCopy.dwHeight != pDestTexture->dwHeight)
         return CMP_ERR_SIZE_MISMATCH;
 
-    printf("Check codec src\n");
     CodecType srcType = GetCodecType(srcTextureCopy.format);
     assert(srcType != CT_Unknown);
     if (srcType == CT_Unknown)
         return CMP_ERR_UNSUPPORTED_SOURCE_FORMAT;
 
-    printf("Check codec destination\n");
     CodecType destType = GetCodecType(pDestTexture->format);
     assert(destType != CT_Unknown);
     if (destType == CT_Unknown)
         return CMP_ERR_UNSUPPORTED_DEST_FORMAT;
 
     // Figure out the type of processing we are doing
-
-    printf("Pre-flight done\n");
-
     bool compressing   = srcType == CT_None && destType != CT_None;
     bool decompressing = srcType != CT_None && destType == CT_None;
 
@@ -404,13 +396,11 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
 #endif
         )
         {
-            printf("CodecCompress Threaded\n");
             return CodecCompressTextureThreaded(&srcTextureCopy, pDestTexture, pOptions, pFeedbackProc);
         }
         else
 #endif  // THREADED_COMPRESS
         {
-            printf("CodecCompress Non-Threaded\n");
             return CodecCompressTexture(&srcTextureCopy, pDestTexture, pOptions, pFeedbackProc);
         }
     }
@@ -490,32 +480,22 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     // Setup Compressed Mip Set Target
     // --------------------------------
     //if (GetCodecType(pOptions->DestFormat) == CT_Unknown) return CMP_ERR_UNKNOWN_DESTINATION_FORMAT;
-    printf("Test 1\n");
     // -------------
     // Output
     // -------------
-    printf("Test A\n");
     memset(p_MipSetOut, 0, sizeof(CMP_MipSet));
-    printf("Test B\n");
     p_MipSetOut->m_Flags   = MS_FLAG_Default;
-    printf("Test C\n");
     p_MipSetOut->m_format  = pOptions->DestFormat;
 
-    printf("Set format to: %d", pOptions->DestFormat);
-
-    printf("Test D\n");
     p_MipSetOut->m_nHeight = p_MipSetIn->m_nHeight;
-    printf("Test E\n");
     p_MipSetOut->m_nWidth  = p_MipSetIn->m_nWidth;
-    printf("Test F\n");
     CMP_Format2FourCC(pOptions->DestFormat, p_MipSetOut);
-    printf("Test 2\n");
+
     // Default compression block size if not set!
     p_MipSetIn->m_nBlockWidth  = (p_MipSetIn->m_nBlockWidth == 0) ? 4 : p_MipSetIn->m_nBlockWidth;
     p_MipSetIn->m_nBlockHeight = (p_MipSetIn->m_nBlockHeight == 0) ? 4 : p_MipSetIn->m_nBlockHeight;
     p_MipSetIn->m_nDepth       = (p_MipSetIn->m_nDepth < 1) ? 1 : p_MipSetIn->m_nDepth;
 
-    printf("Test 3\n");
     // Allocate compression data
     p_MipSetOut->m_nMipLevels    = 1;  // this is overwritten depending on input.
     p_MipSetOut->m_ChannelFormat = CF_Compressed;
@@ -525,13 +505,11 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     p_MipSetOut->m_nDepth        = p_MipSetIn->m_nDepth;
     p_MipSetOut->m_TextureType   = p_MipSetIn->m_TextureType;
 
-    printf("Test 4\n");
     if (pOptions->DestFormat == CMP_FORMAT_BROTLIG)
         p_MipSetOut->m_transcodeFormat = p_MipSetIn->m_format;
 
     p_MipSetOut->m_nIterations = 0;  // tracks number of processed data miplevels
 
-    printf("Test 5\n");
     //=====================================================
     // Case Uncompressed Source to Compressed Destination
     //=====================================================
@@ -607,7 +585,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
     else
 #endif
     {
-        printf("Test 6\n");
         if (!CMips.AllocateMipSet(p_MipSetOut,
                                   p_MipSetOut->m_ChannelFormat,
                                   TDT_ARGB,
@@ -629,14 +606,11 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
         {
             srcNumMipmapLevels = 1;
         }
-        printf("Test 7\n");
 
         p_MipSetOut->m_nMipLevels = p_MipSetIn->m_nMipLevels;
 
         for (int nMipLevel = 0; nMipLevel < srcNumMipmapLevels; nMipLevel++)
         {
-            printf("Test 8 %d / %d\n", nMipLevel, srcNumMipmapLevels);
-
 // Disabled, not working in Compressonator.NET
 // #ifndef _LINUX
 //             if (pOptions->m_PrintInfoStr && srcNumMipmapLevels > 1)
@@ -649,7 +623,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 
             for (int nFaceOrSlice = 0; nFaceOrSlice < CMP_MaxFacesOrSlices(p_MipSetIn, nMipLevel); nFaceOrSlice++)
             {
-                printf("Test 9 Face: %d \n", nFaceOrSlice);
                 CMP_DWORD sourceDataSize = 0;
 
                 //=====================
@@ -668,15 +641,11 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 
                 srcTexture.dwDataSize      = CMP_CalculateBufferSize(&srcTexture);
 
-                printf("Test 10\n");
-
                 // Temporary settings
                 p_MipSetIn->dwWidth    = srcTexture.dwWidth;
                 p_MipSetIn->dwHeight   = srcTexture.dwHeight;
                 p_MipSetIn->pData      = srcTexture.pData;
                 p_MipSetIn->dwDataSize = srcTexture.dwDataSize;
-
-                printf("Test 11\n");
 
                 //========================
                 // Compressed Destination
@@ -690,10 +659,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 destTexture.nBlockWidth     = p_MipSetOut->m_nBlockWidth;
                 destTexture.nBlockHeight    = p_MipSetOut->m_nBlockHeight;
                 destTexture.format          = pOptions->DestFormat;
-                printf("Set destTexture format to: %d", pOptions->DestFormat);
                 destTexture.transcodeFormat = p_MipSetOut->m_transcodeFormat;
-
-                printf("Test 12\n");
 
                 destTexture.dwDataSize      = CMP_CalculateBufferSize(&destTexture);
 
@@ -701,8 +667,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 p_MipSetOut->dwDataSize = destTexture.dwDataSize;
                 p_MipSetOut->dwWidth    = destTexture.dwWidth;
                 p_MipSetOut->dwHeight   = destTexture.dwHeight;
-
-                printf("Test 13\n");
 
                 //--------------------------------------
                 // Allocate MipSet for Block Compressors
@@ -712,8 +676,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 {
                     return CMP_ERR_MEM_ALLOC_FOR_MIPSET;
                 }
-
-                printf("Test 14\n");
 
                 destTexture.pData  = pOutMipLevel->m_pbData;
                 p_MipSetOut->pData = pOutMipLevel->m_pbData;
@@ -742,8 +704,7 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 // this is needed to preserve the correct initial source size because CMP_ConvertTexture might
                 // edit the srcTexture and change its format into one better suited for processing
                 sourceDataSize = srcTexture.dwDataSize;
-                printf("format to: %d", pOptions->DestFormat);
-                printf("Test 15\n");
+
                 //========================
                 // Process ConvertTexture
                 //========================
@@ -763,7 +724,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
                 }
 // // Disabled, not working in Compressonator.NET
 // #ifndef _LINUX
-//                 printf("Test 18\n");
 //                 //==========================
 //                 // Print info about output
 //                 //==========================
@@ -779,7 +739,6 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 //                     pOptions->m_PrintInfoStr(buff);
 //                 }
 // #endif
-printf("Test 19\n");
             }
         }
     }
