@@ -467,7 +467,6 @@ typedef struct
     CMP_INT iNormalBits;   // quantization bits for normal - default 10
     CMP_INT iGenericBits;  // quantization bits for generic - default 8
 
-#ifdef USE_3DMESH_OPTIMIZE
     CMP_INT iVcacheSize;      // For mesh vertices optimization, hardware vertex cache size. (value range 1 - no limit as it
                               // allows users to simulate hardware cache size to find the most optimum size)- default is enabled with cache size = 16
     CMP_INT iVcacheFIFOSize;  // For mesh vertices optimization, hardware vertex cache size. (value range 1 - no limit as it
@@ -477,7 +476,6 @@ typedef struct
     CMP_INT iSimplifyLOD;     // simplify mesh using LOD (Level of Details) value specified.(value range 1- no limit as it allows users
                               // to simplify the mesh until the level they desired. Higher level means less triangles drawn, less details.)
     bool bVertexFetch;        // optimize vertices fetch . boolean value 0 - disabled, 1-enabled. -default is enabled.
-#endif
 
     CMP_FORMAT SourceFormat;
     CMP_FORMAT DestFormat;
