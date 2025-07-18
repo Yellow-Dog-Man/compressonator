@@ -37,16 +37,16 @@ PluginInterface_GPUDecode* g_GPUDecode_plugin = NULL;
 static CMP_GPUDecode DecodeType = GPUDecode_INVALID;
 
 //
-// CMP_InitializeDecompessLibrary - Initialize the DeCompression library based in GPU Driver support types
+// CMP_InitializeDecompressLibrary - Initialize the DeCompression library based in GPU Driver support types
 //
-CMP_ERROR CMP_API CMP_InitializeDecompessLibrary(CMP_GPUDecode GPUDecodeType, CMP_DWORD Width, CMP_DWORD Height, WNDPROC callback)
+CMP_ERROR CMP_API CMP_InitializeDecompressLibrary(CMP_GPUDecode GPUDecodeType, CMP_DWORD Width, CMP_DWORD Height, WNDPROC callback)
 {
     if (g_GPUDecode_plugin && (DecodeType == GPUDecodeType))
         return CMP_OK;
 
     if (GPUDecodeType != DecodeType)
     {
-        CMP_ShutdownDecompessLibrary();
+        CMP_ShutdownDecompressLibrary();
     }
 
     switch (GPUDecodeType)
@@ -76,9 +76,9 @@ CMP_ERROR CMP_API CMP_InitializeDecompessLibrary(CMP_GPUDecode GPUDecodeType, CM
 }
 
 //
-// CMP_ShutdownDecompessLibrary - Shutdown the DeCompression library
+// CMP_ShutdownDecompressLibrary - Shutdown the DeCompression library
 //
-CMP_ERROR CMP_API CMP_ShutdownDecompessLibrary()
+CMP_ERROR CMP_API CMP_ShutdownDecompressLibrary()
 {
     if (g_GPUDecode_plugin)
     {
@@ -95,7 +95,7 @@ CMP_ERROR CMP_API CMP_DecompressTexture(const CMP_Texture* pSourceTexture, CMP_T
     CMP_ERROR result;
 
     // This is temporary code we should move this into CLI and GUI
-    result = CMP_InitializeDecompessLibrary(GPUDecodeType, pSourceTexture->dwWidth, pSourceTexture->dwHeight, NULL);
+    result = CMP_InitializeDecompressLibrary(GPUDecodeType, pSourceTexture->dwWidth, pSourceTexture->dwHeight, NULL);
     if (result != CMP_OK)
         return (result);
 

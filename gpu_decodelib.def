@@ -2,6 +2,6 @@
 
 EXPORTS
     CMP_DecompressTexture
-    CMP_InitializeDecompessLibrary
-    CMP_ShutdownDecompessLibrary
+    CMP_InitializeDecompressLibrary
+    CMP_ShutdownDecompressLibrary
 
