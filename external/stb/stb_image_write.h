@@ -1134,15 +1134,17 @@ STBIWDEF unsigned char *stbi_write_png_to_mem(const unsigned char *pixels, int s
    signed char *line_buffer;
    int j = 0, zlen = 0;
 
+   int line_buffer_length = x * n;
+
    if (stride_bytes == 0)
-      stride_bytes = x * n;
+      stride_bytes = line_buffer_length;
 
    if (force_filter >= 5) {
       force_filter = -1;
    }
 
-   filt = (unsigned char *) STBIW_MALLOC((x*n+1) * y); if (!filt) return 0;
-   line_buffer = (signed char *) STBIW_MALLOC(x * n); if (!line_buffer) { STBIW_FREE(filt); return 0; }
+   filt = (unsigned char *) STBIW_MALLOC((line_buffer_length+1) * y); if (!filt) return 0;
+   line_buffer = (signed char *) STBIW_MALLOC(line_buffer_length); if (!line_buffer) { STBIW_FREE(filt); return 0; }
    for (j=0; j < y; ++j) {
       int filter_type;
       if (force_filter > -1) {
@@ -1155,8 +1157,11 @@ STBIWDEF unsigned char *stbi_write_png_to_mem(const unsigned char *pixels, int s
 
             // Estimate the entropy of the line using this filter; the less, the better.
             est = 0;
-            for (i = 0; i < x*n; ++i) {
-               est += abs((signed char) line_buffer[i]);
+
+            for (i = 0; i < line_buffer_length; ++i) {
+               if (i < line_buffer_length) {
+                  est += abs((signed char) line_buffer[i]);
+               }
             }
             if (est < best_filter_val) {
                best_filter_val = est;
