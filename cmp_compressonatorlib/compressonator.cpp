@@ -754,7 +754,7 @@ CMP_ERROR CMP_API CMP_MipSetToTexture(const CMP_MipSet* mipSet, CMP_INT mipLevel
         return CMP_OK;
 
     CMP_MipLevel* mipLevel = 0;
-    CMP_GetMipLevel(&mipLevel, &mipSet, mipLevelIndex, 0);
+    CMP_GetMipLevel(&mipLevel, mipSet, mipLevelIndex, 0);
 
     if (!mipLevel)
         return CMP_OK;
