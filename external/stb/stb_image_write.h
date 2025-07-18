@@ -1132,7 +1132,7 @@ STBIWDEF unsigned char *stbi_write_png_to_mem(const unsigned char *pixels, int s
    unsigned char sig[8] = { 137,80,78,71,13,10,26,10 };
    unsigned char *out,*o, *filt, *zlib;
    signed char *line_buffer;
-   int j,zlen;
+   int j = 0, zlen = 0;
 
    if (stride_bytes == 0)
       stride_bytes = x * n;
@@ -1149,7 +1149,7 @@ STBIWDEF unsigned char *stbi_write_png_to_mem(const unsigned char *pixels, int s
          filter_type = force_filter;
          stbiw__encode_png_line((unsigned char*)(pixels), stride_bytes, x, y, j, n, force_filter, line_buffer);
       } else { // Estimate the best filter by running through all of them:
-         int best_filter = 0, best_filter_val = 0x7fffffff, est, i;
+         int best_filter = 0, best_filter_val = 0x7fffffff, est = 0, i = 0;
          for (filter_type = 0; filter_type < 5; filter_type++) {
             stbiw__encode_png_line((unsigned char*)(pixels), stride_bytes, x, y, j, n, filter_type, line_buffer);
 
