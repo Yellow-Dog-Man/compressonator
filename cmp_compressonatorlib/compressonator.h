@@ -965,6 +965,11 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
                                      const CMP_CompressOptions* pOptions,
                                      CMP_Feedback_Proc          pFeedbackProc);
 
+// A basic function that can turn a specific mipmap level of a mipset into a texture object
+// does not handle all cases perfectly
+// Originally found in applications/_plugins/common/cmdline.cpp
+CMP_ERROR CMP_API CMP_MipSetToTexture(const CMP_MipSet* mipSet, CMP_INT mipLevelIndex, CMP_Texture* pDestTexture);
+
 #ifdef __cplusplus
 };
 #endif
