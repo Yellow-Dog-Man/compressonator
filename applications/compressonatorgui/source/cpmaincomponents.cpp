@@ -565,7 +565,7 @@ void cpMainComponents::closeEvent(QCloseEvent* event)
     }
 
 #ifdef _WIN32
-    CMP_ShutdownDecompessLibrary();
+    CMP_ShutdownDecompressLibrary();
 #endif
 
     if (m_projectview)
@@ -2647,7 +2647,7 @@ cpMainComponents::~cpMainComponents()
 {
     g_bAbortCompression = true;
 #ifdef _WIN32
-    CMP_ShutdownDecompessLibrary();
+    CMP_ShutdownDecompressLibrary();
 #endif
 }
 

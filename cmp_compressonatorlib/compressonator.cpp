@@ -746,3 +746,38 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 
     return CMP_OK;
 }
+
+CMP_ERROR CMP_API CMP_MipSetToTexture(const CMP_MipSet* mipSet, CMP_INT mipLevelIndex, CMP_Texture* pDestTexture) {
+    assert(mipSet);
+    assert(pDestTexture);
+    assert(mipLevelIndex);
+
+    if (mipLevelIndex < 0 || mipLevelIndex >= mipSet->m_nMipLevels)
+        return CMP_OK;
+
+    CMP_MipLevel* mipLevel = 0;
+    CMP_GetMipLevel(&mipLevel, mipSet, mipLevelIndex, 0);
+
+    if (!mipLevel)
+        return CMP_OK;
+
+    pDestTexture->dwSize = sizeof(CMP_Texture);
+
+    pDestTexture->dwWidth  = mipLevel->m_nWidth;
+    pDestTexture->dwHeight = mipLevel->m_nHeight;
+    pDestTexture->dwPitch  = 0;
+
+    pDestTexture->format          = mipSet->m_format;
+    pDestTexture->transcodeFormat = mipSet->m_transcodeFormat;
+
+    pDestTexture->nBlockWidth  = mipSet->m_nBlockWidth;
+    pDestTexture->nBlockHeight = mipSet->m_nBlockHeight;
+    pDestTexture->nBlockDepth  = mipSet->m_nBlockDepth;
+
+    pDestTexture->dwDataSize = mipLevel->m_dwLinearSize;
+    pDestTexture->pData      = mipLevel->m_pbData;
+
+    pDestTexture->pMipSet = (void*)&mipSet;
+
+    return CMP_OK;
+}

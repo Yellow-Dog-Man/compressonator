@@ -968,6 +968,11 @@ CMP_ERROR CMP_API CMP_ConvertTexture(CMP_Texture*               pSourceTexture,
                                      const CMP_CompressOptions* pOptions,
                                      CMP_Feedback_Proc          pFeedbackProc);
 
+// A basic function that can turn a specific mipmap level of a mipset into a texture object
+// does not handle all cases perfectly
+// Originally found in applications/_plugins/common/cmdline.cpp
+CMP_ERROR CMP_API CMP_MipSetToTexture(const CMP_MipSet* mipSet, CMP_INT mipLevelIndex, CMP_Texture* pDestTexture);
+
 #ifdef __cplusplus
 };
 #endif
@@ -1057,6 +1062,12 @@ CMP_ERROR CMP_API CMP_ConvertMipTexture(CMP_MipSet* p_MipSetIn, CMP_MipSet* p_Mi
 //--------------------------------------------
 CMP_ERROR CMP_API  CMP_LoadTexture(const char* sourceFile, CMP_MipSet* pMipSet);
 CMP_ERROR CMP_API  CMP_SaveTexture(const char* destFile, CMP_MipSet* pMipSet);
+/// Saves a CMP_Texture to a file. For simple formats, this is a quick call to stb_image_write. 
+/// For more complex formats, a temporary mip set is created, therefore if you're working with a complex format, it is recommended to work with MipSets Directly.
+/// \param[in] destFile The destination file path
+/// \param[in] pTexture Pointer to the CMP_Texture to save
+/// \return CMP_OK if successful, otherwise an error code
+CMP_ERROR CMP_API  CMP_SaveTextureEx(const char* destFile, CMP_Texture* pTexture);
 CMP_ERROR CMP_API  CMP_ProcessTexture(CMP_MipSet* srcMipSet, CMP_MipSet* dstMipSet, KernelOptions kernelOptions, CMP_Feedback_Proc pFeedbackProc);
 CMP_ERROR CMP_API  CMP_CompressTexture(KernelOptions* options, CMP_MipSet srcMipSet, CMP_MipSet dstMipSet, CMP_Feedback_Proc pFeedback);
 CMP_VOID CMP_API   CMP_Format2FourCC(CMP_FORMAT format, CMP_MipSet* pMipSet);

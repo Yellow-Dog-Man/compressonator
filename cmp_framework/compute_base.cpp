@@ -717,6 +717,17 @@ char toupperChar(char ch)
     return static_cast<char>(::toupper(static_cast<unsigned char>(ch)));
 }
 
+static std::string GetFileExtension(const char* filename)
+{
+    if (!filename)
+        return "";
+        
+    const std::string& fn = filename;
+    std::string file_extension = fn.substr(fn.find_last_of('.') + 1);
+    std::transform(file_extension.begin(), file_extension.end(), file_extension.begin(), toupperChar);
+    return file_extension;
+}
+
 void CMP_API CMP_InitFramework()
 {
     CMP_RegisterHostPlugins();
@@ -729,11 +740,7 @@ CMP_ERROR CMP_API CMP_LoadTexture(const char* SourceFile, CMP_MipSet* MipSetIn)
     CMP_CMIPS CMips;
     CMP_ERROR status = CMP_OK;
 
-    const std::string& fn = SourceFile;
-
-    std::string file_extension = fn.substr(fn.find_last_of('.') + 1);
-
-    std::transform(file_extension.begin(), file_extension.end(), file_extension.begin(), toupperChar);
+    std::string file_extension = GetFileExtension(SourceFile);
 
     PluginInterface_Image* plugin_Image;
     do
@@ -789,11 +796,7 @@ CMP_ERROR CMP_API CMP_SaveTexture(const char* DestFile, CMP_MipSet* MipSetIn)
     bool  filesaved = false;
     CMIPS m_CMIPS;
 
-    const std::string& fn = DestFile;
-
-    std::string file_extension = fn.substr(fn.find_last_of('.') + 1);
-
-    std::transform(file_extension.begin(), file_extension.end(), file_extension.begin(), toupperChar);
+    std::string file_extension = GetFileExtension(DestFile);
 
     //if (((((file_extension.compare("DDS") == 0)
     //    || file_extension.compare("KTX") == 0)
@@ -835,6 +838,92 @@ CMP_ERROR CMP_API CMP_SaveTexture(const char* DestFile, CMP_MipSet* MipSetIn)
     }
 
     return CMP_OK;
+}
+
+static CMP_ERROR SaveTextureViaMipSet(const char* destFile, CMP_Texture* pTexture)
+{
+    CMP_MipSet tempMipSet = {};
+    
+    ChannelFormat channelFormat;
+    TextureDataType textureDataType = TDT_ARGB;
+    
+    if (CMP_IsCompressedFormat(pTexture->format))
+        channelFormat = CF_Compressed;
+    else
+        channelFormat = GetChannelFormat(pTexture->format);
+    
+    CMP_ERROR result = CMP_CreateMipSet(&tempMipSet, pTexture->dwWidth, pTexture->dwHeight, 1, channelFormat, TT_2D);
+    if (result != CMP_OK)
+        return result;
+    
+    tempMipSet.m_format = pTexture->format;
+    tempMipSet.m_transcodeFormat = pTexture->transcodeFormat;
+    tempMipSet.m_nBlockWidth = pTexture->nBlockWidth;
+    tempMipSet.m_nBlockHeight = pTexture->nBlockHeight;
+    tempMipSet.m_nBlockDepth = pTexture->nBlockDepth;
+    
+    CMP_MipLevel* pMipLevel = NULL;
+    CMP_GetMipLevel(&pMipLevel, &tempMipSet, 0, 0);
+    
+    if (pMipLevel)
+    {
+        // Free the originally allocated data since we don't need it
+        if (pMipLevel->m_pbData)
+        {
+            free(pMipLevel->m_pbData);
+        }
+        
+        // Update pointers
+        pMipLevel->m_pbData = pTexture->pData;
+        pMipLevel->m_dwLinearSize = pTexture->dwDataSize;
+        tempMipSet.pData = pTexture->pData;
+        tempMipSet.dwDataSize = pTexture->dwDataSize;
+        
+        result = CMP_SaveTexture(destFile, &tempMipSet);
+        
+        // The texture we passed in, could still be needed, we don't want the mipset to free its data when we free it.
+        pMipLevel->m_pbData = NULL;
+        tempMipSet.pData = NULL;
+    }
+    else
+    {
+        result = CMP_ERR_GENERIC;
+    }
+    
+    CMP_FreeMipSet(&tempMipSet);
+    
+    return result;
+}
+
+CMP_ERROR CMP_API CMP_SaveTextureEx(const char* destFile, CMP_Texture* pTexture)
+{
+    if (!destFile || !pTexture)
+        return CMP_ERR_INVALID_DEST_TEXTURE;
+
+    if (!pTexture->pData || pTexture->dwDataSize == 0)
+        return CMP_ERR_INVALID_SOURCE_TEXTURE;
+
+    std::string file_extension = GetFileExtension(destFile);
+
+    // For simple formats (PNG, BMP, JPG), save directly using stbi
+    if (file_extension.compare("PNG") == 0)
+    {
+        stbi_write_png(destFile, pTexture->dwWidth, pTexture->dwHeight, 4, pTexture->pData, pTexture->dwWidth * 4);
+        return CMP_OK;
+    }
+    else if (file_extension.compare("BMP") == 0)
+    {
+        stbi_write_bmp(destFile, pTexture->dwWidth, pTexture->dwHeight, 4, pTexture->pData);
+        return CMP_OK;
+    }
+    else if (file_extension.compare("JPG") == 0 || file_extension.compare("JPEG") == 0)
+    {
+        stbi_write_jpg(destFile, pTexture->dwWidth, pTexture->dwHeight, 4, pTexture->pData, 100);
+        return CMP_OK;
+    }
+    
+    // For other formats (DDS, KTX, etc.)
+    return SaveTextureViaMipSet(destFile, pTexture);
 }
 
 CMP_INT CMP_API CMP_NumberOfProcessors(void)

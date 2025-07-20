@@ -7,6 +7,7 @@ CMP_CreateCompressMipSet
 
 CMP_LoadTexture
 CMP_SaveTexture
+CMP_SaveTextureEx
 CMP_ProcessTexture
 CMP_CompressTexture
 CMP_Format2FourCC

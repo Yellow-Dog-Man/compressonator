@@ -41,16 +41,16 @@ extern "C" {
 CMP_ERROR CMP_API CMP_DecompressTexture(const CMP_Texture* pSourceTexture, CMP_Texture* pDestTexture, CMP_GPUDecode GPUDecodeType);
 
 //
-/// CMP_InitializeDecompessLibrary - Initialize the DeCompression library based in GPU Driver support types
+/// CMP_InitializeDecompressLibrary - Initialize the DeCompression library based in GPU Driver support types
 /// \return    CMP_OK if successful, otherwise the error code.
 //
-CMP_ERROR CMP_APICMP_InitializeDecompessLibrary(CMP_GPUDecode GPUDecodeType);
+CMP_ERROR CMP_API CMP_InitializeDecompressLibrary(CMP_GPUDecode GPUDecodeType);
 
 //
-/// CMP_ShutdownDecompessLibrary - Shutdown the DeCompression library
+/// CMP_ShutdownDecompressLibrary - Shutdown the DeCompression library
 /// \return    CMP_OK if successful, otherwise the error code.
 //
-CMP_ERROR CMP_API CMP_ShutdownDecompessLibrary();
+CMP_ERROR CMP_API CMP_ShutdownDecompressLibrary();
 #endif
 #ifdef __cplusplus
 };

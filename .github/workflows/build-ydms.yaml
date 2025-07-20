@@ -61,6 +61,11 @@ jobs:
         run: |
           mkdir results
           cp -r build/Release*/x64/** results
+      # These next 2 steps are a temporary solve for: https://github.com/Yellow-Dog-Man/compressonator/issues/9
+      - name: Adjust CMP_Framework Name
+        run: mv results/CMP_Framework_MD_DLL.dll results/CMP_Framework.dll
+      - name: Adjust CMP_Compressonator Name
+        run: mv results/Compressonator_MD_DLL.dll results/CMP_Compressonator.dll
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

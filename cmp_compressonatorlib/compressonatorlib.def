@@ -31,8 +31,11 @@ CMP_MipSetAnlaysis
 
 CMP_ConvertMipTexture
 
+CMP_MipSetToTexture
+
 CMP_LoadTexture
 CMP_SaveTexture
+CMP_SaveTextureEx
 CMP_ProcessTexture
 CMP_CompressTexture
 CMP_Format2FourCC
