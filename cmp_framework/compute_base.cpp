@@ -645,7 +645,7 @@ void CMP_API CMP_DestroyBlockEncoder(void** block_encoder)
     delete (CMP_Encoder*)(*block_encoder);
 }
 
-void CMP_API CMP_GetMipLevel(CMP_MipLevel** data, const CMP_MipSet* pMipSet, int nMipLevel, int nFaceOrSlice)
+void CMP_API CMP_GetMipLevel(CMP_MipLevel** data, const CMP_MipSet* pMipSet, CMP_INT nMipLevel, CMP_INT nFaceOrSlice)
 {
     CMP_CMIPS CMips;
     *data = CMips.GetMipLevel(pMipSet, nMipLevel, nFaceOrSlice);
