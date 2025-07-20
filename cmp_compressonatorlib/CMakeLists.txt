@@ -128,4 +128,4 @@ endif()
 
 # TODO: More libraries should be linked like this when building so that we don't have to constantly repeat source file includes
 # Not just for CMP_Compressonator, do the same for the Framework and all other libraries
-target_link_libraries(CMP_Compressonator PUBLIC CMP_Core)
+target_link_libraries(CMP_Compressonator PUBLIC CMP_Core CMP_Framework)
