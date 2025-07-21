@@ -867,13 +867,10 @@ static CMP_ERROR SaveTextureViaMipSet(const char* destFile, CMP_Texture* pTextur
     
     if (pMipLevel)
     {
-        // Free the originally allocated data since we don't need it
-        if (pMipLevel->m_pbData)
-        {
-            free(pMipLevel->m_pbData);
-        }
+        // Store the original allocated pointer to restore it later
+        CMP_BYTE* originalData = pMipLevel->m_pbData;
         
-        // Update pointers
+        // Point to the texture's data instead of copying
         pMipLevel->m_pbData = pTexture->pData;
         pMipLevel->m_dwLinearSize = pTexture->dwDataSize;
         tempMipSet.pData = pTexture->pData;
@@ -881,9 +878,9 @@ static CMP_ERROR SaveTextureViaMipSet(const char* destFile, CMP_Texture* pTextur
         
         result = CMP_SaveTexture(destFile, &tempMipSet);
         
-        // The texture we passed in, could still be needed, we don't want the mipset to free its data when we free it.
-        pMipLevel->m_pbData = NULL;
-        tempMipSet.pData = NULL;
+        // Restore the original pointer before cleanup so FreeMipSet can clean it up properly
+        pMipLevel->m_pbData = originalData;
+        tempMipSet.pData = originalData;
     }
     else
     {
