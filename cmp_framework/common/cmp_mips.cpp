@@ -1134,9 +1134,7 @@ void CMP_CMIPS::FreeMipSet(CMP_MipSet* pMipSet)
             {
                 if (pMipSet->m_pMipLevelTable[i])
                 {
-                    // Use the dedicated function to clean up MipLevel data
-                    FreeMipLevelData(pMipSet->m_pMipLevelTable[i]);
-                    
+                    FreeMipLevelData(pMipSet->m_pMipLevelTable[i], pMipSet->m_format);
                     // Free the MipLevel structure itself
                     free(pMipSet->m_pMipLevelTable[i]);
                     pMipSet->m_pMipLevelTable[i] = NULL;
@@ -1151,15 +1149,22 @@ void CMP_CMIPS::FreeMipSet(CMP_MipSet* pMipSet)
     }
 }
 
-void CMP_CMIPS::FreeMipLevelData(CMP_MipLevel* pMipLevel)
+void CMP_CMIPS::FreeMipLevelData(CMP_MipLevel* pMipLevel, CMP_FORMAT setFormat)
 {
-    // Clean up m_pvec8Data if it was allocated
-    if (pMipLevel->m_pvec8Data)
+    if (!pMipLevel)
+        return;
+
+    // When Basis is used, m_pvec8data is assigned to a CMP_VEC8, this uses new()
+    // so we have to use delete.
+    // TODO: I don't know the status of BASIS, but we certainly don't use it at YDMS. - ProbablePrime
+    if (setFormat == CMP_FORMAT_BASIS)
     {
         delete pMipLevel->m_pvec8Data;
         pMipLevel->m_pvec8Data = NULL;
+        return;
     }
 
+    // Other formats, all use variations of malloc which means they are safe to use with free.
     if (pMipLevel->m_pbData)
     {
         free(pMipLevel->m_pbData);
