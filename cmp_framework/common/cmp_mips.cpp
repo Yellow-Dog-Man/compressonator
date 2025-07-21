@@ -1132,21 +1132,12 @@ void CMP_CMIPS::FreeMipSet(CMP_MipSet* pMipSet)
 
             for (int i = 0; i < nTotalOldMipLevels; i++)
             {
-                // Clean up m_pvec8Data if it was allocated
-                if (pMipSet->m_pMipLevelTable[i]->m_pvec8Data)
-                {
-                    delete pMipSet->m_pMipLevelTable[i]->m_pvec8Data;
-                    pMipSet->m_pMipLevelTable[i]->m_pvec8Data = NULL;
-                }
-
-                if (pMipSet->m_pMipLevelTable[i]->m_pbData)
-                {
-                    free(pMipSet->m_pMipLevelTable[i]->m_pbData);
-                    pMipSet->m_pMipLevelTable[i]->m_pbData = NULL;
-                }
-
                 if (pMipSet->m_pMipLevelTable[i])
                 {
+                    // Use the dedicated function to clean up MipLevel data
+                    FreeMipLevelData(pMipSet->m_pMipLevelTable[i]);
+                    
+                    // Free the MipLevel structure itself
                     free(pMipSet->m_pMipLevelTable[i]);
                     pMipSet->m_pMipLevelTable[i] = NULL;
                 }
@@ -1162,6 +1153,13 @@ void CMP_CMIPS::FreeMipSet(CMP_MipSet* pMipSet)
 
 void CMP_CMIPS::FreeMipLevelData(CMP_MipLevel* pMipLevel)
 {
+    // Clean up m_pvec8Data if it was allocated
+    if (pMipLevel->m_pvec8Data)
+    {
+        delete pMipLevel->m_pvec8Data;
+        pMipLevel->m_pvec8Data = NULL;
+    }
+
     if (pMipLevel->m_pbData)
     {
         free(pMipLevel->m_pbData);
