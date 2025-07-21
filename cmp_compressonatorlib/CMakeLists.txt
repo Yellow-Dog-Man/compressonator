@@ -129,3 +129,12 @@ endif()
 # TODO: More libraries should be linked like this when building so that we don't have to constantly repeat source file includes
 # Not just for CMP_Compressonator, do the same for the Framework and all other libraries
 target_link_libraries(CMP_Compressonator PUBLIC CMP_Core CMP_Framework)
+
+# Set RPATH so the library can find its dependencies at runtime
+# // https://duerrenberger.dev/blog/2021/08/04/understanding-rpath-with-cmake/
+if(UNIX)
+    set_target_properties(CMP_Compressonator PROPERTIES
+        INSTALL_RPATH "$ORIGIN"
+        BUILD_WITH_INSTALL_RPATH TRUE
+    )
+endif()
