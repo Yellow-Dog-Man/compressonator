@@ -1132,19 +1132,16 @@ void CMP_CMIPS::FreeMipSet(CMP_MipSet* pMipSet)
 
             for (int i = 0; i < nTotalOldMipLevels; i++)
             {
+                // Clean up m_pvec8Data if it was allocated
+                if (pMipSet->m_pMipLevelTable[i]->m_pvec8Data)
+                {
+                    delete pMipSet->m_pMipLevelTable[i]->m_pvec8Data;
+                    pMipSet->m_pMipLevelTable[i]->m_pvec8Data = NULL;
+                }
+
                 if (pMipSet->m_pMipLevelTable[i]->m_pbData)
                 {
-#ifdef USE_BASIS
-                    if (pMipSet->m_format == CMP_FORMAT_BASIS)
-                    {
-                        CMP_VEC8& basis_data = *(pMipSet->m_pMipLevelTable[i]->m_pvec8Data);
-                        if (basis_data.size() > 0)
-                            delete &basis_data;
-                    }
-                    else
-#endif
-                        free(pMipSet->m_pMipLevelTable[i]->m_pbData);
-
+                    free(pMipSet->m_pMipLevelTable[i]->m_pbData);
                     pMipSet->m_pMipLevelTable[i]->m_pbData = NULL;
                 }
 
