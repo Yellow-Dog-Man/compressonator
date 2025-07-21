@@ -1097,6 +1097,36 @@ bool CMP_CMIPS::AllocateCompressedMipLevelData(CMP_MipLevel* pMipLevel, int nWid
     return (pMipLevel->m_pbData != NULL);
 }
 
+void CMP_CMIPS::FreeMipLevelData(CMP_MipLevel* pMipLevel)
+{
+    if (!pMipLevel)
+        return;
+    // Other formats, all use variations of malloc which means they are safe to use with free.
+    if (pMipLevel->m_pbData)
+    {
+        free(pMipLevel->m_pbData);
+        pMipLevel->m_pbData = NULL;
+    }
+}
+
+void CMP_CMIPS::FreeMipLevelData(CMP_MipLevel* pMipLevel, CMP_FORMAT setFormat)
+{
+    if (!pMipLevel)
+        return;
+    
+    // When Basis is used, m_pvec8data is assigned to a CMP_VEC8, this uses new()
+    // so we have to use delete.
+    // TODO: I don't know the status of BASIS, but we certainly don't use it at YDMS. - ProbablePrime
+    if (setFormat == CMP_FORMAT_BASIS)
+    {
+        delete pMipLevel->m_pvec8Data;
+        pMipLevel->m_pvec8Data = NULL;
+        return;
+    }
+
+    FreeMipLevelData(pMipLevel);
+}
+
 void CMP_CMIPS::FreeMipSet(CMP_MipSet* pMipSet)
 {
     //TODO test
@@ -1147,36 +1177,6 @@ void CMP_CMIPS::FreeMipSet(CMP_MipSet* pMipSet)
             pMipSet->m_nMipLevels     = 0;
         }
     }
-}
-
-void CMP_CMIPS::FreeMipLevelData(CMP_MipLevel* pMipLevel)
-{
-    if (!pMipLevel)
-        return;
-    // Other formats, all use variations of malloc which means they are safe to use with free.
-    if (pMipLevel->m_pbData)
-    {
-        free(pMipLevel->m_pbData);
-        pMipLevel->m_pbData = NULL;
-    }
-}
-
-void CMP_CMIPS::FreeMipLevelData(CMP_MipLevel* pMipLevel, CMP_FORMAT setFormat)
-{
-    if (!pMipLevel)
-        return;
-    
-    // When Basis is used, m_pvec8data is assigned to a CMP_VEC8, this uses new()
-    // so we have to use delete.
-    // TODO: I don't know the status of BASIS, but we certainly don't use it at YDMS. - ProbablePrime
-    if (setFormat == CMP_FORMAT_BASIS)
-    {
-        delete pMipLevel->m_pvec8Data;
-        pMipLevel->m_pvec8Data = NULL;
-        return;
-    }
-
-    FreeMipLevelData(pMipLevel);
 }
 
 bool CMP_CMIPS::AllocateCompressedDestBuffer(CMP_MipSet* SourceTexture, CMP_FORMAT format, CMP_MipSet* DestTexture)
