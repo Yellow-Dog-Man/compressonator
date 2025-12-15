@@ -287,6 +287,17 @@ include(external/cmake/dependencyinfo.cmake)
 include(external/cmake/CMakeLists.txt)
 include(external/CMakeLists.txt)
 
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-mavx512f" COMPILER_SUPPORTS_AVX512F)
+
+option(ENABLE_AVX512 "Build with AVX-512 support" OFF)
+
+if (ENABLE_AVX512 AND COMPILER_SUPPORTS_AVX512F)
+    add_library(CMP_Core_AVX512 cmp_core/source/core_simd_avx512.cpp)
+    target_compile_options(CMP_Core_AVX512 PRIVATE -mavx512f)
+    # Link and use as required
+endif()
+
 if (CMP_HOST_WINDOWS)
     add_compile_definitions(_WIN32)
 
